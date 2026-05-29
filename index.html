@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radar Social RD</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <style>
+        :root {
+            --bg-dark: #060913;
+            --panel-glass: rgba(10, 15, 30, 0.75);
+            --border-glass: rgba(0, 210, 196, 0.15);
+            --electric-blue: #00e5ff;
+            --neon-glow: rgba(0, 229, 255, 0.4);
+            --text-main: #f0f4f8;
+            --text-muted: #6c7a9c;
+            --alert-red: #ff3838;
+            --warning-amber: #ffb300;
+            --success-green: #00ff66;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Lexend', system-ui, -apple-system, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow: hidden;
+        }
+
+        /* Pantallas de Transición (Login / Roles) */
+        .screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background: radial-gradient(circle at center, #0d1527 0%, #050811 100%);
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 400px;
+            background: var(--panel-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: 24px;
+            padding: 35px 25px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+            text-align: center;
+        }
+
+        .brand-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .brand-logo {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #00b4d8 0%, var(--electric-blue) 100%);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 25px var(--neon-glow);
+        }
+
+        .brand-logo svg {
+            width: 32px;
+            height: 32px;
+            fill: #050811;
+        }
+
+        .brand-title {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* Formularios */
+        .form-group {
+            width: 100%;
+            margin-bottom: 16px;
+            text-align: left;
+        }
+
+        .input-control {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            color: var(--text-main);
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .input-control:focus {
+            outline: none;
+            border-color: var(--electric-blue);
+            background: rgba(0, 229, 255, 0.02);
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--electric-blue);
+            color: #050811;
+            box-shadow: 0 4px 20px rgba(0, 229, 255, 0.25);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 25px rgba(0, 229, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+            margin-top: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* Tarjetas de Selección de Rol */
+        .role-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .role-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 18px;
+            padding: 20px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .role-card:hover {
+            border-color: var(--electric-blue);
+            background: rgba(0, 229, 255, 0.01);
+            transform: translateY(-2px);
+        }
+
+        .role-icon-box {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.04);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .role-info h3 { font-size: 16px; font-weight: 600; margin-bottom: 2px; }
+        .role-info p { font-size: 12px; color: var(--text-muted); }
+
+        /* Interfaz Principal del Mapa */
+        #main-app {
+            display: none;
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* Panel Flotante de Control */
+        .app-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 360px;
+            background: var(--panel-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: 24px;
+            padding: 24px;
+            z-index: 1000;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .user-tag {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255,255,255,0.03);
+            padding: 12px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            background: var(--electric-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #050811;
+            font-weight: 700;
+        }
+
+        .feed-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 220px;
+            overflow-y: auto;
+        }
+
+        .section-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .incident-item {
+            background: rgba(255,255,255,0.02);
+            border-left: 4px solid var(--alert-red);
+            padding: 12px;
+            border-radius: 0 12px 12px 0;
+            font-size: 13px;
+        }
+
+        /* Adaptabilidad para Teléfonos Moviles */
+        @media (max-width: 480px) {
+            .app-panel {
+                width: calc(100% - 32px);
+                top: auto;
+                bottom: 16px;
+                left: 16px;
+                padding: 18px;
+                border-radius: 20px;
+            }
+            .feed-section { max-height: 140px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="login-screen" class="screen">
+        <div class="auth-container">
+            <div class="brand-header">
+                <div class="brand-logo">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                </div>
+                <h1 class="brand-title">Radar Social RD</h1>
+                <p class="brand-subtitle">Inicia sesión para continuar</p>
+            </div>
+            <div class="form-group">
+                <input type="email" class="input-control" placeholder="Correo electrónico" value="demo@radarsocial.rd">
+            </div>
+            <div class="form-group" style="margin-bottom: 24px;">
+                <input type="password" class="input-control" placeholder="Contraseña" value="••••••••">
+            </div>
+            <button class="btn btn-primary" onclick="showRoles()">Iniciar sesión</button>
+            <button class="btn btn-secondary" onclick="showRoles()">Entrar como invitado</button>
+        </div>
+    </div>
+
+    <div id="role-screen" class="screen" style="display: none;">
+        <div class="auth-container">
+            <div class="brand-header" style="margin-bottom: 15px;">
+                <h1 class="brand-title">Elige tu acceso</h1>
+                <p class="brand-subtitle">Selecciona el tipo de cuenta para continuar</p>
+            </div>
+            <div class="role-selector">
+                <div class="role-card" onclick="startApp('Acceso Ciudadano', 'C')">
+                    <div class="role-icon-box">📱</div>
+                    <div class="role-info">
+                        <h3>Acceso Ciudadano</h3>
+                        <p>Reporta incidentes y consulta el mapa viales.</p>
+                    </div>
+                </div>
+                <div class="role-card" onclick="startApp('Consola Institucional', 'I')" style="border-color: rgba(255, 179, 0, 0.2);">
+                    <div class="role-icon-box">🏢</div>
+                    <div class="role-info">
+                        <h3>Consola Institucional</h3>
+                        <p>Panel administrativo y métricas en vivo (DIGESETT).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="main-app">
+        <div class="app-panel">
+            <h2 style="font-size: 18px; font-weight: 700; color: var(--electric-blue); display: flex; align-items: center; gap: 8px;">
+                📡 Radar Social RD
+            </h2>
+            
+            <div class="user-tag">
+                <div class="user-avatar" id="avatar-char">U</div>
+                <div>
+                    <p style="font-size: 13px; font-weight: 600;" id="role-display">Usuario</p>
+                    <p style="font-size: 11px; color: var(--text-muted);">Conectado • Sto. Dgo.</p>
+                </div>
+            </div>
+
+            <p class="section-title">Reportes Recientes</p>
+            <div class="feed-section">
+                <div class="incident-item" style="border-color: var(--alert-red);">
+                    <strong>Av. 27 de Febrero</strong>
+                    <p style="color: var(--text-muted); font-size: 12px; margin-top: 2px;">Tránsito crítico en el túnel oeste.</p>
+                </div>
+                <div class="incident-item" style="border-color: var(--warning-amber);">
+                    <strong>Autopista Duarte Km 9</strong>
+                    <p style="color: var(--text-muted); font-size: 12px; margin-top: 2px;">Semáforo fuera de servicio.</p>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" style="padding: 12px; font-size: 14px;" onclick="alert('Ubicación capturada. Desarrollando módulo de reporte en tiempo real...')">
+                ⚡ Reportar Incidencia
+            </button>
+        </div>
+
+        <div id="map"></div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script>
+        var map;
+
+        function showRoles() {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('role-screen').style.display = 'flex';
+        }
+
+        function startApp(roleName, avatarChar) {
+            document.getElementById('role-screen').style.display = 'none';
+            document.getElementById('main-app').style.display = 'block';
+            document.getElementById('role-display').innerText = roleName;
+            document.getElementById('avatar-char').innerText = avatarChar;
+
+            // Inicializar el mapa centrado en Santo Domingo, RD
+            if (!map) {
+                map = L.map('map', {
+                    center: [18.4861, -69.9312], // Coordenadas de Santo Domingo
+                    zoom: 13,
+                    zoomControl: false
+                });
+
+                // Capa de mapa estilo oscuro premium (CartoDB DarkMatter)
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                    attribution: '&copy; OpenStreetMap &copy; CARTO'
+                }).addTo(map);
+
+                // Añadir un par de marcadores de prueba en el mapa de Santo Domingo
+                L.marker([18.4795, -69.9248]).addTo(map).bindPopup("<b>🚨 Tránsito Pesado:</b> Av. 27 de Febrero");
+                L.marker([18.4984, -69.9622]).addTo(map).bindPopup("<b>⚠️ Avería:</b> Km 9 Aut. Duarte");
+            }
+
+            // Forzar refresco del mapa debido al cambio de pantallas ocultas
+            setTimeout(function(){ 
+                map.invalidateSize(); 
+            }, 300);
+        }
+    </script>
+</body>
+</html>
