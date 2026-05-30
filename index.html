@@ -29,23 +29,9 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Lexend', sans-serif; -webkit-tap-highlight-color: transparent; }
         body, html { width: 100%; height: 100%; background-color: var(--bg-dark-pure); color: var(--text-main); overflow: hidden; }
 
-        /* INICIO INTEGRACIÓN TOMTOM: Estilo Aviso Premium */
-        .dev-warning-badge {
-            background: rgba(255, 204, 0, 0.1);
-            border: 1px solid var(--neon-yellow);
-            color: var(--neon-yellow);
-            padding: 12px 20px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            backdrop-filter: blur(10px);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-align: left;
-            box-shadow: 0 4px 15px rgba(255, 204, 0, 0.1);
-        }
+        /* INICIO INTEGRACIÓN TOMTOM: Estilo Aviso Premium y Status */
+        .dev-warning-badge { background: rgba(255, 204, 0, 0.1); border: 1px solid var(--neon-yellow); color: var(--neon-yellow); padding: 12px 20px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-bottom: 20px; backdrop-filter: blur(10px); display: flex; align-items: center; gap: 10px; text-align: left; box-shadow: 0 4px 15px rgba(255, 204, 0, 0.1); }
+        .tomtom-status-badge { position: absolute; top: 20px; right: 80px; z-index: 1000; padding: 6px 12px; border-radius: 20px; font-size: 10px; font-weight: 700; background: var(--glass-bg); border: 1px solid var(--glass-border); display: flex; align-items: center; gap: 6px; }
         /* FIN INTEGRACIÓN TOMTOM */
 
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -53,26 +39,10 @@
         ::-webkit-scrollbar-thumb { background: rgba(0, 242, 254, 0.2); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--neon-blue); }
 
-        .screen-portal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px;
-            background: radial-gradient(circle at center, #0a1535 0%, var(--bg-dark-pure) 100%);
-        }
-        .portal-grid-bg {
-            position: absolute; width: 100%; height: 100%;
-            background-image: linear-gradient(rgba(0, 242, 254, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 242, 254, 0.03) 1px, transparent 1px);
-            background-size: 40px 40px; pointer-events: none;
-        }
-        .portal-container {
-            width: 100%; max-width: 500px; background: var(--glass-bg); border: 1px solid var(--glass-border);
-            border-radius: 28px; padding: 40px 30px; backdrop-filter: blur(30px); text-align: center;
-            box-shadow: var(--panel-shadow); position: relative; z-index: 10;
-        }
-        .portal-badge {
-            display: inline-block; padding: 6px 14px; background: rgba(0, 242, 254, 0.08);
-            border: 1px solid var(--glass-border); border-radius: 30px; font-size: 11px;
-            text-transform: uppercase; letter-spacing: 2px; color: var(--neon-blue); margin-bottom: 20px;
-        }
+        .screen-portal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; background: radial-gradient(circle at center, #0a1535 0%, var(--bg-dark-pure) 100%); }
+        .portal-grid-bg { position: absolute; width: 100%; height: 100%; background-image: linear-gradient(rgba(0, 242, 254, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 242, 254, 0.03) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; }
+        .portal-container { width: 100%; max-width: 500px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 28px; padding: 40px 30px; backdrop-filter: blur(30px); text-align: center; box-shadow: var(--panel-shadow); position: relative; z-index: 10; }
+        .portal-badge { display: inline-block; padding: 6px 14px; background: rgba(0, 242, 254, 0.08); border: 1px solid var(--glass-border); border-radius: 30px; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--neon-blue); margin-bottom: 20px; }
         .portal-title { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700; letter-spacing: -0.5px; line-height: 1.2; margin-bottom: 6px; }
         .portal-subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 30px; }
         .national-stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 35px; }
@@ -82,23 +52,12 @@
         .btn-core { width: 100%; padding: 16px; border: none; border-radius: 16px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
         .btn-neon { background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue)); color: #03060f; font-weight: 700; box-shadow: 0 8px 30px rgba(0, 242, 254, 0.3); }
         .btn-neon:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0, 242, 254, 0.5); }
-        #main-dashboard-env { display: none; width: 100%; height: 100%; position: relative; }
         
-        /* INICIO INTEGRACIÓN TOMTOM: Fondo Tecnológico */
+        #main-dashboard-env { display: none; width: 100%; height: 100%; position: relative; }
         #map { width: 100%; height: 100%; position: absolute; z-index: 1; background: #01040d; }
-        .map-overlay-digital {
-            position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 2;
-            pointer-events: none;
-            background: radial-gradient(circle at 50% 50%, rgba(0, 242, 254, 0.03) 0%, transparent 80%);
-        }
-        /* FIN INTEGRACIÓN TOMTOM */
+        .map-overlay-digital { position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 2; pointer-events: none; background: radial-gradient(circle at 50% 50%, rgba(0, 242, 254, 0.03) 0%, transparent 80%); }
 
-        .dashboard-side-panel {
-            position: absolute; top: 20px; left: 20px; width: 380px; max-height: calc(100% - 40px);
-            background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 24px;
-            padding: 24px; z-index: 1000; backdrop-filter: blur(20px); box-shadow: var(--panel-shadow);
-            display: flex; flex-direction: column; gap: 20px; overflow-y: auto;
-        }
+        .dashboard-side-panel { position: absolute; top: 20px; left: 20px; width: 380px; max-height: calc(100% - 40px); background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 24px; padding: 24px; z-index: 1000; backdrop-filter: blur(20px); box-shadow: var(--panel-shadow); display: flex; flex-direction: column; gap: 20px; overflow-y: auto; }
         .panel-header-system { display: flex; align-items: center; justify-content: space-between; }
         .sys-identity h2 { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; }
         .sys-identity p { font-size: 11px; color: var(--neon-blue); font-weight: 500; }
@@ -126,25 +85,10 @@
         .incident-log-table { display: flex; flex-direction: column; gap: 8px; max-height: 180px; overflow-y: auto; }
         .log-row { background: rgba(255,38,38,0.03); border: 1px solid rgba(255,59,48,0.1); padding: 10px; border-radius: 10px; font-size: 11px; display: flex; justify-content: space-between; align-items: center; }
         .btn-dispatch { background: var(--neon-red); color: white; padding: 4px 10px; border: none; border-radius: 6px; font-size: 10px; font-weight: 600; cursor: pointer; }
-        .floating-action-trigger {
-            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 1000;
-            background: #ffffff; color: #03060f; padding: 14px 30px; border-radius: 40px; font-size: 14px;
-            font-weight: 700; border: none; cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            display: flex; align-items: center; gap: 8px; transition: all 0.2s;
-        }
+        .floating-action-trigger { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 1000; background: #ffffff; color: #03060f; padding: 14px 30px; border-radius: 40px; font-size: 14px; font-weight: 700; border: none; cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
         .floating-action-trigger:active { transform: translateX(-50%) scale(0.96); }
-        .control-utility-round {
-            position: absolute; top: 20px; right: 20px; z-index: 1000;
-            width: 46px; height: 46px; background: var(--glass-bg); border: 1px solid var(--glass-border);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;
-            color: var(--neon-blue); box-shadow: var(--panel-shadow); backdrop-filter: blur(10px);
-        }
-        .bottom-sheet-report {
-            position: absolute; bottom: -450px; left: 50%; transform: translateX(-50%);
-            width: 100%; max-width: 440px; background: var(--glass-bg); border-top: 1px solid var(--glass-border);
-            border-radius: 28px 28px 0 0; padding: 24px; z-index: 1010; backdrop-filter: blur(25px);
-            box-shadow: 0 -15px 40px rgba(0,0,0,0.6); transition: bottom 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
+        .control-utility-round { position: absolute; top: 20px; right: 20px; z-index: 1000; width: 46px; height: 46px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--neon-blue); box-shadow: var(--panel-shadow); backdrop-filter: blur(10px); }
+        .bottom-sheet-report { position: absolute; bottom: -450px; left: 50%; transform: translateX(-50%); width: 100%; max-width: 440px; background: var(--glass-bg); border-top: 1px solid var(--glass-border); border-radius: 28px 28px 0 0; padding: 24px; z-index: 1010; backdrop-filter: blur(25px); box-shadow: 0 -15px 40px rgba(0,0,0,0.6); transition: bottom 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         .bottom-sheet-report.active { bottom: 0; }
         .sheet-drag-line { width: 40px; height: 5px; background: rgba(255,255,255,0.2); border-radius: 3px; margin: -10px auto 18px; }
         .sheet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
@@ -153,33 +97,6 @@
         .opt-report-card:hover { border-color: var(--neon-blue); background: rgba(0,242,254,0.03); }
         .opt-report-card span { font-size: 26px; display: block; margin-bottom: 6px; }
         .opt-report-card label { font-size: 11px; font-weight: 500; display: block; cursor: pointer; }
-        .pulse-marker-core { display: flex; align-items: center; justify-content: center; }
-        .marker-neon-ring {
-            width: 16px; height: 16px; border-radius: 50%; position: relative;
-            box-shadow: 0 0 10px cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .marker-neon-ring::after {
-            content: ''; position: absolute; width: 100%; height: 100%; border-radius: 50%;
-            top: 0; left: 0; border: 2px solid inherit; animation: radar-wave 1.8s infinite linear;
-        }
-        @keyframes radar-wave {
-            0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(3.5); opacity: 0; }
-        }
-        .user-gps-core {
-            width: 14px; height: 14px; background: #ffffff; border: 3px solid var(--neon-blue);
-            border-radius: 50%; box-shadow: 0 0 15px var(--neon-blue); position: relative;
-        }
-        .user-gps-core::before {
-            content: ''; position: absolute; top: -15px; left: -15px; width: 38px; height: 38px;
-            border: 2px solid var(--neon-blue); border-radius: 50%; animation: radar-wave 2s infinite linear;
-            opacity: 0;
-        }
-
-        @media (max-width: 480px) {
-            .dashboard-side-panel { width: calc(100% - 32px); top: 16px; left: 16px; max-height: 55%; }
-            .bottom-sheet-report { max-width: 100%; }
-        }
     </style>
 </head>
 <body>
@@ -187,264 +104,111 @@
     <div id="portal-screen-system" class="screen-portal">
         <div class="portal-grid-bg"></div>
         <div class="portal-container">
-            <div class="dev-warning-badge">
-                <span>⚠️ Esto es un modelo de prueba. Esta aplicación actualmente se encuentra en desarrollo.</span>
-            </div>
+            <div class="dev-warning-badge">⚠️ Esto es un modelo de prueba. Esta aplicación actualmente se encuentra en desarrollo.</div>
             <span class="portal-badge">Centro de Mando Nacional</span>
             <h1 class="portal-title">Sistema Nacional de Inteligencia Vial (SNIV)</h1>
             <p class="portal-subtitle">Radar Social RD • Plataforma Ciudadana</p>
-            
             <div class="national-stats-grid">
-                <div class="stat-portal-card">
-                    <label>Conductores Conectados</label>
-                    <span id="p-users">14,205</span>
-                </div>
-                <div class="stat-portal-card">
-                    <label>Alertas Activas Nacional</label>
-                    <span style="color: var(--neon-yellow);" id="p-alerts">42</span>
-                </div>
-                <div class="stat-portal-card">
-                    <label>Nivel de Riesgo General</label>
-                    <span style="color: var(--neon-red);">MODERADO (34%)</span>
-                </div>
-                <div class="stat-portal-card">
-                    <label>Monitoreo Satelital</label>
-                    <span style="color: var(--neon-green);">OPERATIVO</span>
-                </div>
+                <div class="stat-portal-card"><label>Conductores Conectados</label><span id="p-users">14,205</span></div>
+                <div class="stat-portal-card"><label>Alertas Activas Nacional</label><span style="color: var(--neon-yellow);" id="p-alerts">42</span></div>
             </div>
-
             <button class="btn-core btn-neon" onclick="entrarPlataforma()">Acceder al Centro de Control</button>
         </div>
     </div>
 
     <div id="main-dashboard-env">
+        <!-- Indicador de estado TomTom -->
+        <div id="tomtom-status" class="tomtom-status-badge">🔴 CONECTANDO...</div>
+        
         <div class="dashboard-side-panel">
             <div class="panel-header-system">
-                <div class="sys-identity">
-                    <h2>SNIV MONITORING</h2>
-                    <p>Radar Social RD v3.0</p>
-                </div>
-                <div class="live-indicator"><span class="pulse-dot"></span> EN VIVO</div>
+                <div class="sys-identity"><h2>SNIV MONITORING</h2><p>Radar Social RD v3.0</p></div>
             </div>
-
             <div class="interface-toggle-pill">
                 <div class="toggle-tab active" id="tab-civic" onclick="cambiarModoPanel('ciudadano')">Panel Ciudadano</div>
                 <div class="toggle-tab" id="tab-gov" onclick="cambiarModoPanel('institucional')">Centro Institucional</div>
             </div>
-
             <div id="panel-content-citizen" style="display: flex; flex-direction: column; gap: 20px;">
-                <div class="telemetry-dashboard-grid">
-                    <div class="telemetry-card">
-                        <label>Alertas Hoy</label>
-                        <div class="value" style="color: var(--neon-cyan);">189</div>
-                    </div>
-                    <div class="telemetry-card">
-                        <label>Nodos Conectados</label>
-                        <div class="value">3,124</div>
-                    </div>
-                    <div class="telemetry-card">
-                        <label>Riesgo Nacional</label>
-                        <div class="value" style="color: var(--neon-yellow);">Low-Mod</div>
-                    </div>
-                    <div class="telemetry-card">
-                        <label>Provincias Activas</label>
-                        <div class="value">6</div>
-                    </div>
-                </div>
-
                 <div class="layer-control-box">
-                    <p class="section-title" style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">Filtros de Capas de Red</p>
-                    <div class="layer-chip-btn active" id="layer-acc" onclick="conmutarCapaMapa('accidentes')">
-                        <span>💥 Accidentes Viales</span><div class="indicator-dot" style="background: var(--neon-red);"></div>
-                    </div>
-                    <div class="layer-chip-btn active" id="layer-con" onclick="conmutarCapaMapa('tapones')">
-                        <span>🚗 Tráfico TomTom Real</span><div class="indicator-dot" style="background: var(--neon-yellow);"></div>
-                    </div>
+                    <div class="layer-chip-btn active" id="layer-acc" onclick="conmutarCapaMapa('accidentes')"><span>💥 Accidentes Viales</span><div class="indicator-dot" style="background: var(--neon-red);"></div></div>
+                    <div class="layer-chip-btn active" id="layer-con" onclick="conmutarCapaMapa('tapones')"><span>🚗 Tráfico TomTom Real</span><div class="indicator-dot" style="background: var(--neon-yellow);"></div></div>
                 </div>
             </div>
-
-            <div id="panel-content-institutional" class="institutional-ops-box">
-                <p class="section-title" style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Consola de Despacho 911 / DIGESETT</p>
-                <div class="telemetry-dashboard-grid">
-                    <div class="telemetry-card" style="border-color: rgba(255,59,48,0.3);">
-                        <label>Incidentes Críticos</label>
-                        <div class="value" style="color: var(--neon-red);">03</div>
-                    </div>
-                    <div class="telemetry-card">
-                        <label>Unidades Ruta</label>
-                        <div class="value">45</div>
-                    </div>
-                </div>
-                <div class="incident-log-table">
-                    <div class="log-row">
-                        <div><strong>Colisión Múltiple</strong><br><span style="color:var(--text-muted)">Av. 27 de Feb • Hace 2 min</span></div>
-                        <button class="btn-dispatch" onclick="alert('Unidad de DIGESETT asignada al sector.')">Despachar</button>
-                    </div>
-                </div>
-            </div>
-
+            <div id="panel-content-institutional" class="institutional-ops-box"></div>
             <div class="ai-engine-card">
                 <div class="ai-status-row">
                     <div class="ai-processing-text"><span class="ai-pulse-ring"></span> <span id="ai-dynamic-status">PROCESANDO CÁLCULO DE RIESGO...</span></div>
-                    <span style="font-family:'Space Grotesk'; font-size:11px; color:var(--neon-blue); font-weight:700;">IA CORE v4.1</span>
                 </div>
-                <div class="ai-risk-list">
-                    <div class="ai-risk-item"><span>Av. 27 de Febrero</span><strong style="color: var(--neon-red);" id="ai-risk-1">82% Riesgo</strong></div>
-                    <div class="ai-risk-item"><span>Autopista Duarte Km 9</span><strong style="color: var(--neon-yellow);" id="ai-risk-2">54% Riesgo</strong></div>
-                </div>
+                <div class="ai-risk-list"><div class="ai-risk-item"><span>Av. 27 de Febrero</span><strong style="color: var(--neon-red);" id="ai-risk-1">82% Riesgo</strong></div></div>
             </div>
         </div>
 
         <div class="control-utility-round" onclick="obtenerGpsReal()">🎯</div>
-
-        <button class="floating-action-trigger" onclick="abrirMenuReporte(true)">
-            ⚠️ Registrar Evento Vial
-        </button>
+        <button class="floating-action-trigger" onclick="abrirMenuReporte(true)">⚠️ Registrar Evento Vial</button>
 
         <div class="bottom-sheet-report" id="report-sheet-view">
             <div class="sheet-drag-line"></div>
-            <div class="sheet-header">
-                <h3 style="font-size:16px; font-weight:700;">Transmisión de Alerta en Tiempo Real</h3>
-                <div class="close-circle" onclick="abrirMenuReporte(false)">✕</div>
-            </div>
+            <div class="sheet-header"><h3 style="font-size:16px; font-weight:700;">Transmisión de Alerta</h3><div onclick="abrirMenuReporte(false)">✕</div></div>
             <div class="grid-options-report">
-                <div class="opt-report-card" onclick="inyectarReporteCiudadano('Accidente Crítico', '💥', 'accidentes')"><span>💥</span><label>Accidente</label></div>
-                <div class="opt-report-card" onclick="inyectarReporteCiudadano('Tapón Pesado', '🚗', 'tapones')"><span>🚗</span><label>Tapón</label></div>
-                <div class="opt-report-card" onclick="inyectarReporteCiudadano('Bloqueo de Vía', '🚧', 'accidentes')"><span>🚧</span><label>Bloqueo</label></div>
+                <div class="opt-report-card" onclick="inyectarReporteCiudadano('Accidente', '💥', 'accidentes')"><span>💥</span><label>Accidente</label></div>
+                <div class="opt-report-card" onclick="inyectarReporteCiudadano('Tapón', '🚗', 'tapones')"><span>🚗</span><label>Tapón</label></div>
             </div>
         </div>
 
-        <div id="map">
-            <div class="map-overlay-digital"></div>
-            </div>
+        <div id="map"><div class="map-overlay-digital"></div></div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <script src="https://leaflet.github.io/Leaflet.heat/dist/leaflet-heat.js"></script>
-
     <script>
-        // INICIO INTEGRACIÓN TOMTOM
         const TOMTOM_API_KEY = "5GNRp1s2qoee5rR29JzjYajUl8yA7dF2";
-        let tomTomTrafficLayer;
-        let tomTomIncidentsLayer;
-
-        function inicializarTomTomLayers() {
-            // Capa de Flujo de Tráfico (Real-time Flow)
-            tomTomTrafficLayer = L.tileLayer(`https://api.tomtom.com/traffic/map/4/tile/flow/relative/12/{z}/{x}/{y}.png?key=${TOMTOM_API_KEY}`, {
-                opacity: 0.8,
-                zIndex: 2
-            });
-
-            // Capa de Incidentes
-            tomTomIncidentsLayer = L.tileLayer(`https://api.tomtom.com/traffic/map/4/tile/incidents/s3/{z}/{x}/{y}.png?key=${TOMTOM_API_KEY}`, {
-                opacity: 0.9,
-                zIndex: 3
-            });
-        }
-
-        function actualizarDatosTomTom() {
-            console.log("Sincronizando datos en tiempo real con TomTom...");
-            // Las capas de tiles se refrescan automáticamente al re-añadirlas o cambiar su URL
-            // El API de TomTom maneja la actualización en tiempo real desde el servidor.
-        }
-
-        // Actualización programada cada 60 segundos
-        setInterval(actualizarDatosTomTom, 60000);
-        // FIN INTEGRACIÓN TOMTOM
-
-        var map;
-        var centerRD = [18.8500, -70.7000];
-        
-        var capasRed = {
-            accidentes: L.layerGroup(),
-            tapones: L.layerGroup(), // Aquí inyectaremos TomTom
-            hospitales: L.layerGroup(),
-            gasolinera: L.layerGroup(),
-            heatmap: L.layerGroup()
-        };
-
-        var estadoCapasActivas = { accidentes: true, tapones: true, hospitales: false, gasolinera: false, heatmap: true };
+        let map, trafficFlowLayer, trafficIncidentsLayer;
+        var capasRed = { accidentes: L.layerGroup(), tapones: L.layerGroup() };
 
         function entrarPlataforma() {
             document.getElementById('portal-screen-system').style.display = 'none';
             document.getElementById('main-dashboard-env').style.display = 'block';
-            initEcosistemaMapa();
+            initMapa();
         }
 
-        function initEcosistemaMapa() {
-            if (!map) {
-                map = L.map('map', { center: centerRD, zoom: 8, zoomControl: false, fadeAnimation: true });
-                
-                L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                    maxZoom: 20
-                }).addTo(map);
+        function initMapa() {
+            map = L.map('map', { center: [18.4861, -69.9312], zoom: 12 });
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
 
-                // INICIO INTEGRACIÓN TOMTOM
-                inicializarTomTomLayers();
-                tomTomTrafficLayer.addTo(capasRed.tapones);
-                tomTomIncidentsLayer.addTo(capasRed.tapones);
-                // FIN INTEGRACIÓN TOMTOM
+            // Integración TomTom
+            trafficFlowLayer = L.tileLayer(`https://api.tomtom.com/traffic/map/4/tile/flow/relative/12/{z}/{x}/{y}.png?key=${TOMTOM_API_KEY}`, { zIndex: 5 });
+            trafficIncidentsLayer = L.tileLayer(`https://api.tomtom.com/traffic/map/4/tile/incidents/s3/{z}/{x}/{y}.png?key=${TOMTOM_API_KEY}`, { zIndex: 6 });
 
-                for (var key in capasRed) {
-                    if (estadoCapasActivas[key]) { capasRed[key].addTo(map); }
-                }
-                
-                initCicloMotorIA();
-            }
-            setTimeout(function(){ map.invalidateSize(); }, 250);
+            [trafficFlowLayer, trafficIncidentsLayer].forEach(layer => {
+                layer.on('load', () => {
+                    document.getElementById('tomtom-status').innerHTML = '🟢 TOMTOM ONLINE';
+                    document.getElementById('tomtom-status').style.color = 'var(--neon-green)';
+                    console.log("TomTom iniciado, Capas cargadas, Estado API correcto");
+                });
+                layer.on('tileerror', () => {
+                    document.getElementById('tomtom-status').innerHTML = '🔴 TOMTOM OFFLINE';
+                    document.getElementById('tomtom-status').style.color = 'var(--neon-red)';
+                    console.error("Error de red/autenticación TomTom");
+                });
+            });
+
+            trafficFlowLayer.addTo(capasRed.tapones);
+            trafficIncidentsLayer.addTo(capasRed.tapones);
+            capasRed.tapones.addTo(map);
         }
 
-        function conmutarCapaMapa(capaKey) {
-            estadoCapasActivas[capaKey] = !estadoCapasActivas[capaKey];
-            var btnElement = document.getElementById(`layer-${capaKey.substring(0,3)}`);
-            if (btnElement) btnElement.classList.toggle('active', estadoCapasActivas[capaKey]);
-
-            if (estadoCapasActivas[capaKey]) {
-                map.addLayer(capasRed[capaKey]);
-            } else {
-                map.removeLayer(capasRed[capaKey]);
-            }
+        function conmutarCapaMapa(key) {
+            if (map.hasLayer(capasRed[key])) map.removeLayer(capasRed[key]);
+            else map.addLayer(capasRed[key]);
         }
 
         function cambiarModoPanel(modo) {
-            document.getElementById('tab-civic').classList.toggle('active', modo === 'ciudadano');
-            document.getElementById('tab-gov').classList.toggle('active', modo === 'institucional');
             document.getElementById('panel-content-citizen').style.display = modo === 'ciudadano' ? 'flex' : 'none';
             document.getElementById('panel-content-institutional').style.display = modo === 'institucional' ? 'flex' : 'none';
         }
 
-        function abrirMenuReporte(abrir) {
-            document.getElementById('report-sheet-view').classList.toggle('active', abrir);
-        }
-
-        function inyectarReporteCiudadano(tipo, icono, capaDestino) {
-            abrirMenuReporte(false);
-            var latVariada = 18.4861 + (Math.random() - 0.5) * 0.05;
-            var lngVariada = -69.9312 + (Math.random() - 0.5) * 0.05;
-
-            var customIconReport = L.divIcon({
-                html: `<div style="font-size: 20px; background: #03060f; padding: 6px; border-radius: 50%; box-shadow: 0 0 12px var(--neon-red); display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border: 1px solid var(--neon-red);">${icono}</div>`,
-                className: 'user-report-marker', iconSize: [34, 34], iconAnchor: [17, 17]
-            });
-
-            L.marker([latVariada, lngVariada], { icon: customIconReport }).addTo(capasRed[capaDestino])
-                .bindPopup(`<b>Alerta: ${tipo}</b>`).openPopup();
-        }
-
-        function initCicloMotorIA() {
-            setInterval(function() {
-                var riesgo1 = Math.floor(Math.random() * (95 - 70 + 1)) + 70;
-                document.getElementById('ai-risk-1').innerText = `${riesgo1}% Riesgo`;
-            }, 4000);
-        }
-
-        function obtenerGpsReal() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function(pos) {
-                    map.setView([pos.coords.latitude, pos.coords.longitude], 14);
-                });
-            }
-        }
+        function abrirMenuReporte(abrir) { document.getElementById('report-sheet-view').classList.toggle('active', abrir); }
+        function obtenerGpsReal() { if (navigator.geolocation) navigator.geolocation.getCurrentPosition(pos => map.setView([pos.coords.latitude, pos.coords.longitude], 14)); }
+        function inyectarReporteCiudadano(tipo, icono, capa) { alert('Reporte de ' + tipo + ' registrado.'); abrirMenuReporte(false); }
     </script>
 </body>
 </html>
