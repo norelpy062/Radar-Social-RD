@@ -3,39 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SNIV - Sistema Nacional de Inteligencia Vial</title>
+    <title>SNIV | Centro de Control Nacional</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     <style>
-        body, html { margin: 0; height: 100%; background: #03060f; color: white; font-family: sans-serif; }
-        .screen-portal {
-            position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center;
-            background: linear-gradient(rgba(3,6,15,0.9), rgba(3,6,15,0.9)), url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1920');
-            background-size: cover; padding: 20px; text-align: center;
-        }
-        .container { background: rgba(7,12,30,0.9); padding: 40px; border-radius: 25px; border: 1px solid #00f2fe; max-width: 450px; }
-        .badge { background: #ff3b3026; color: #ff3b30; padding: 5px 15px; border-radius: 20px; font-size: 10px; font-weight: bold; text-transform: uppercase; }
-        .btn { margin-top: 25px; width: 100%; padding: 15px; background: #00f2fe; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; }
-        #map { height: 100%; display: none; }
+        :root { --dark: #03060f; --neon-blue: #00f2fe; --red: #ff3b30; --yellow: #ffcc00; --glass: rgba(7, 12, 30, 0.85); }
+        body, html { margin: 0; height: 100%; background: var(--dark); color: white; font-family: 'Lexend', sans-serif; overflow: hidden; }
+        
+        /* PANTALLA INICIO */
+        #portal { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle, #0a1535, #03060f); padding: 20px; text-align: center; }
+        .card { background: var(--glass); padding: 40px; border-radius: 30px; border: 1px solid var(--neon-blue); max-width: 450px; backdrop-filter: blur(20px); }
+        .warning { background: #ff3b3026; color: var(--red); padding: 8px 16px; border-radius: 20px; font-size: 10px; text-transform: uppercase; font-weight: bold; margin-bottom: 20px; }
+        
+        /* INTERFAZ MAPA */
+        #app { display: none; height: 100%; position: relative; }
+        #map { height: 100%; }
+        .panel { position: absolute; top: 20px; left: 20px; z-index: 1000; width: 350px; background: var(--glass); padding: 20px; border-radius: 20px; backdrop-filter: blur(15px); }
+        
+        /* IA PANEL */
+        .ai-box { margin-top: 15px; padding: 15px; background: rgba(0,242,254,0.05); border-left: 3px solid var(--neon-blue); border-radius: 10px; font-size: 12px; }
+        
+        button { cursor: pointer; border: none; padding: 15px; border-radius: 12px; background: var(--neon-blue); font-weight: bold; width: 100%; }
     </style>
 </head>
 <body>
-    <div id="portal" class="screen-portal">
-        <div class="container">
-            <div class="badge">Este es un modelo de prueba: esta app actualmente se encuentra en desarrollo</div>
-            <h1 style="margin: 20px 0;">SNIV</h1>
-            <p>Sistema Nacional de Inteligencia Vial<br>Radar Social RD</p>
-            <button class="btn" onclick="entrar()">ACCEDER AL SISTEMA</button>
+
+<div id="portal">
+    <div class="card">
+        <div class="warning">Este es un modelo de prueba: esta app se encuentra en desarrollo</div>
+        <h1>SNIV</h1>
+        <p>Sistema Nacional de Inteligencia Vial<br>Radar Social RD</p>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:20px 0;">
+            <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:10px;"><label>Conductores</label><br><b>14,205</b></div>
+            <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:10px;"><label>Alertas</label><br><b>42</b></div>
         </div>
+        <button onclick="entrar()">ACCEDER AL CENTRO DE CONTROL</button>
+    </div>
+</div>
+
+<div id="app">
+    <div class="panel">
+        <h2 style="font-size: 18px; color: var(--neon-blue);">SNIV • Centro de Monitoreo</h2>
+        <div class="ai-box">
+            <b id="ia-status">IA Analizando Riesgo...</b>
+            <div style="margin-top:5px;">Riesgo Nacional: <span id="risk-val">34%</span></div>
+        </div>
+        <hr style="border:0; border-top:1px solid #333; margin:15px 0;">
+        <button onclick="toggleLayer('accidentes')">Toggle Accidentes (Rojo)</button>
     </div>
     <div id="map"></div>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script>
-        function entrar() {
-            document.getElementById('portal').style.display = 'none';
-            document.getElementById('map').style.display = 'block';
-            const map = L.map('map').setView([18.486, -69.931], 13);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
-        }
-    </script>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://leaflet.github.io/Leaflet.heat/dist/leaflet-heat.js"></script>
+<script>
+    let map, heatmap;
+    const provincias = [
+        ["Santo Domingo", 18.486, -69.931], ["Santiago", 19.451, -70.697], 
+        ["SFM", 19.301, -70.252], ["La Vega", 19.221, -70.528], 
+        ["Puerto Plata", 19.793, -70.688], ["Higüey", 18.615, -68.707]
+    ];
+
+    function entrar() {
+        document.getElementById('portal').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+        map = L.map('map').setView([18.850, -70.700], 8);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
+        
+        // Marcadores
+        provincias.forEach(p => L.marker([p[1], p[2]]).addTo(map).bindPopup(p[0]));
+
+        // Heatmap básico
+        heatmap = L.heatLayer([[18.486, -69.931, 0.9], [19.451, -70.697, 0.6]], {radius: 25}).addTo(map);
+
+        // Simulador IA
+        setInterval(() => {
+            document.getElementById('risk-val').innerText = Math.floor(Math.random() * 50) + 20 + "%";
+        }, 3000);
+    }
+</script>
 </body>
 </html>
