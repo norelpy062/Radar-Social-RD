@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Radar Social RD - Modo Oscuro Pro</title>
+    <title>Radar Social RD - Pro Dark</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -16,6 +16,8 @@
             --electric-blue: #00e5ff;
             --text-main: #f0f4f8;
             --text-muted: #6c7a9c;
+            --apple-red: #ff3b30;
+            --apple-yellow: #ffcc00;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Lexend', sans-serif; }
         body, html { width: 100%; height: 100%; background-color: var(--bg-dark); color: var(--text-main); overflow: hidden; }
@@ -41,22 +43,36 @@
         #main-app { display: none; width: 100%; height: 100%; position: relative; }
         #map { width: 100%; height: 100%; z-index: 1; background-color: #060913; }
         
-        /* Panel Lateral Flotante */
-        .app-panel { position: absolute; top: 20px; left: 20px; width: 360px; background: var(--panel-glass); border: 1px solid var(--border-glass); border-radius: 24px; padding: 24px; z-index: 1000; backdrop-filter: blur(16px); display: flex; flex-direction: column; gap: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+        /* Interfaz Flotante Estilo Buscador (Arriba Izquierda) */
+        .maps-search-panel { 
+            position: absolute; top: 20px; left: 20px; width: 360px; 
+            background: var(--panel-glass); border: 1px solid var(--border-glass); 
+            border-radius: 20px; padding: 20px; z-index: 1000; backdrop-filter: blur(16px); 
+            display: flex; flex-direction: column; gap: 14px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); 
+        }
         
-        .live-pulse { width: 8px; height: 8px; background: #00ff66; border-radius: 50%; box-shadow: 0 0 10px #00ff66; display: inline-block; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { transform: scale(0.9); opacity: 0.7; } 50% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(0.9); opacity: 0.7; } }
+        .brand-header { display: flex; align-items: center; justify-content: space-between; }
+        .brand-title { font-size: 18px; font-weight: 700; color: var(--electric-blue); }
+        
+        .live-indicator { background: rgba(0, 255, 102, 0.1); color: #00ff66; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+        .pulse-dot { width: 6px; height: 6px; background: #00ff66; border-radius: 50%; display: inline-block; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(0.9); opacity: 0.7; } 50% { transform: scale(1.3); opacity: 1; } 100% { transform: scale(0.9); opacity: 0.7; } }
 
-        .feed-section { display: flex; flex-direction: column; gap: 10px; max-height: 150px; overflow-y: auto; }
-        .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); font-weight: 700; }
-        .incident-item { background: rgba(255,255,255,0.02); border-left: 4px solid var(--electric-blue); padding: 12px; border-radius: 0 12px 12px 0; font-size: 13px; }
+        .traffic-feed { max-height: 140px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+        .traffic-item { background: rgba(255,255,255,0.02); border-radius: 10px; padding: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
+        .traffic-info h4 { font-size: 13px; font-weight: 600; }
+        .traffic-info p { font-size: 11px; color: var(--text-muted); }
+        
+        .status-pill { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; }
+        .pill-heavy { background: rgba(255,59,48,0.15); color: var(--apple-red); border: 1px solid rgba(255,59,48,0.2); }
+        .pill-mod { background: rgba(255,204,0,0.15); color: var(--apple-yellow); border: 1px solid rgba(255,204,0,0.2); }
 
-        /* Filtros de Capas / Locaciones Estilo Pro */
-        .poi-filter-container { display: flex; gap: 8px; margin-top: 5px; }
-        .filter-chip { flex: 1; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); padding: 8px 4px; border-radius: 10px; font-size: 11px; text-align: center; cursor: pointer; font-weight: 500; transition: all 0.2s; color: var(--text-main); }
-        .filter-chip.active { background: rgba(0, 229, 255, 0.15); border-color: var(--electric-blue); color: var(--electric-blue); }
+        /* Filtros de Puntos de Interés (Gasolineras, Comida, Hospitales) */
+        .poi-filter-container { display: flex; gap: 6px; }
+        .filter-chip { flex: 1; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); padding: 8px 4px; border-radius: 10px; font-size: 11px; text-align: center; cursor: pointer; font-weight: 500; transition: all 0.2s; }
+        .filter-chip.active { background: rgba(0, 229, 255, 0.15); border-color: var(--electric-blue); color: var(--electric-blue); box-shadow: 0 0 10px rgba(0,229,255,0.2); }
 
-        /* Botón Inferior Desplegable iOS */
+        /* Botón Inferior Flotante de Reportes */
         .report-trigger-btn {
             position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
             z-index: 1000; background: var(--electric-blue); color: #050811;
@@ -64,23 +80,38 @@
             box-shadow: 0 8px 25px rgba(0, 229, 255, 0.4); border: none; cursor: pointer;
             transition: all 0.2s ease;
         }
+        .report-trigger-btn:active { transform: translateX(-50%) scale(0.96); }
 
-        /* Menú de Reportes */
+        /* Menú Inferior Desplegable Estilo Apple Maps (Pero Dark) */
         .report-modal {
             position: absolute; bottom: -400px; left: 50%; transform: translateX(-50%);
             width: 100%; max-width: 440px; background: var(--panel-glass);
             border-radius: 24px 24px 0 0; padding: 24px; z-index: 1010;
-            backdrop-filter: blur(25px); box-shadow: 0 -10px 35px rgba(0,0,0,0.5);
-            transition: bottom 0.3s ease-out; border-top: 1px solid var(--border-glass);
+            backdrop-filter: blur(25px); box-shadow: 0 -10px 35px rgba(0,0,0,0.6);
+            transition: bottom 0.3s cubic-bezier(0.16, 1, 0.3, 1); border-top: 1px solid var(--border-glass);
         }
         .report-modal.active { bottom: 0; }
+        .modal-drag-handle { width: 36px; height: 5px; background: rgba(255,255,255,0.2); border-radius: 3px; margin: -12px auto 16px; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .close-circle { width: 28px; height: 28px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .report-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-        .report-option { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 14px; padding: 16px 8px; text-align: center; cursor: pointer; }
-        .report-option:hover { border-color: var(--electric-blue); background: rgba(0,229,255,0.02); }
+        .modal-header h3 { font-size: 17px; font-weight: 700; }
+        .close-circle { width: 28px; height: 28px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; }
 
-        @media (max-width: 480px) { .app-panel { width: calc(100% - 32px); top: 16px; left: 16px; } .report-modal { max-width: 100%; } }
+        .report-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .report-option { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 14px; padding: 16px 8px; text-align: center; cursor: pointer; transition: all 0.2s; }
+        .report-option:active { transform: scale(0.95); }
+        .report-option:hover { border-color: var(--electric-blue); background: rgba(0,229,255,0.03); }
+        .option-icon { font-size: 24px; margin-bottom: 6px; display: block; }
+        .option-label { font-size: 12px; font-weight: 500; }
+
+        /* Botón Redondo GPS */
+        .gps-map-btn {
+            position: absolute; top: 20px; right: 20px; z-index: 1000;
+            width: 44px; height: 44px; background: var(--panel-glass); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 18px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5); border: 1px solid var(--border-glass); cursor: pointer; color: var(--electric-blue);
+        }
+
+        @media (max-width: 480px) { .maps-search-panel { width: calc(100% - 32px); left: 16px; top: 16px; } .report-modal { max-width: 100%; } }
     </style>
 </head>
 <body>
@@ -89,11 +120,7 @@
         <div class="auth-container">
             <h2 style="font-size:15px; text-transform:uppercase; color:var(--electric-blue); letter-spacing:2px; margin-bottom:5px;">Bienvenidos a</h2>
             <h1 style="font-size:32px; margin-bottom:15px; font-weight:800;">📡 Radar Social RD</h1>
-            
-            <div class="dev-badge">
-                ⚠️ <strong>Aviso:</strong> Esto es un demo de prueba, esta app se encuentra en desarrollo actualmente.
-            </div>
-
+            <div class="dev-badge">⚠️ <strong>Aviso:</strong> Esto es un demo de prueba, esta app se encuentra en desarrollo actualmente.</div>
             <button class="btn btn-primary" onclick="showRoles()">Ingresar a la Beta</button>
         </div>
     </div>
@@ -115,46 +142,62 @@
     </div>
 
     <div id="main-app">
-        <div class="app-panel">
-            <h2 style="font-size: 18px; color: var(--electric-blue); display: flex; align-items: center; justify-content: space-between;">
-                📡 Radar Social RD <span style="font-size:12px; color:#00ff66; font-weight:400;"><span class="live-pulse"></span> EN VIVO</span>
-            </h2>
-            
-            <div class="dev-badge" style="margin-bottom: 0; padding: 8px 12px; font-size: 11px;">
-                Demo de prueba • Estado: En desarrollo actualmente
+        
+        <div class="maps-search-panel">
+            <div class="brand-header">
+                <div>
+                    <h2 class="brand-title">Radar Social RD</h2>
+                    <p style="font-size: 11px; color: var(--text-muted);" id="user-role-label">Ciudadano Conectado</p>
+                </div>
+                <div class="live-indicator"><span class="pulse-dot"></span> EN RUTA</div>
             </div>
 
             <div>
-                <p class="section-title" style="margin-bottom: 6px;">Mostrar en ruta:</p>
                 <div class="poi-filter-container">
                     <div class="filter-chip" id="btn-gas" onclick="togglePOI('gasolinera')">⛽ Bombas</div>
                     <div class="filter-chip" id="btn-hosp" onclick="togglePOI('hospital')">🏥 Hospitales</div>
                     <div class="filter-chip" id="btn-rest" onclick="togglePOI('restaurante')">🍔 Comida</div>
                 </div>
             </div>
-            
-            <p class="section-title"><span>Incidentes Activos</span></p>
-            <div class="feed-section" id="feed-container"></div>
+
+            <div style="height: 1px; background: rgba(255,255,255,0.06); width: 100%;"></div>
+
+            <div>
+                <p style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">Estado de Avenidas</p>
+                <div class="traffic-feed" id="traffic-feed-container"></div>
+            </div>
         </div>
 
+        <div class="gps-map-btn" onclick="obtenerGpsReal()">🎯</div>
+
         <button class="report-trigger-btn" onclick="toggleReportModal(true)">
-            ⚠️ Reportar Peligro en Ruta
+            ⚠️ Reportar Peligro Actual
         </button>
 
         <div class="report-modal" id="report-sheet">
+            <div class="modal-drag-handle"></div>
             <div class="modal-header">
-                <h3>¿Qué reportar en tu ruta?</h3>
+                <h3>¿Qué deseas reportar?</h3>
                 <div class="close-circle" onclick="toggleReportModal(false)">✕</div>
             </div>
             <div class="report-grid">
                 <div class="report-option" onclick="procesarReporte('Accidente', '💥')">
-                    <span style="font-size:24px; display:block; margin-bottom:4px;">💥</span><span style="font-size:12px;">Accidente</span>
+                    <span class="option-icon">💥</span><span class="option-label">Accidente</span>
                 </div>
                 <div class="report-option" onclick="procesarReporte('Tapón Crítico', '🚗')">
-                    <span style="font-size:24px; display:block; margin-bottom:4px;">🚗</span><span style="font-size:12px;">Tapón</span>
+                    <span class="option-icon">🚗</span><span class="option-label">Tapón</span>
                 </div>
                 <div class="report-option" onclick="procesarReporte('Calle Cerrada', '🚧')">
-                    <span style="font-size:24px; display:block; margin-bottom:4px;">🚧</span><span style="font-size:12px;">Bloqueo</span>
+                    <span class="option-icon">🚧</span><span class="option-label">Bloqueo</span>
+                </div>
+                <div class="report-option" onclick="procesarReporte('Semáforo Dañado', '🚦')">
+                    <span class="option-icon">🚦</span><span class="option-label">Semáforo</span>
+                </div>
+                <div class="report-option" onclick="procesarReporte('Peligro Vial', '🕳️')">
+                    <span class="option-icon">🕳️</span><span class="option-label">Hoyo/Peligro</span>
+                </div>
+                <div class="report-option" onclick="procesarReporte('Chequeo', '👮')">
+                    <span class="option-icon">👮</span><span class="option-label">Aviso Policial</span>
                 </div>
             </div>
         </div>
@@ -169,15 +212,16 @@
         var markersGroup = [];
         var poiMarkers = {};
         var dbAlertas = [];
-
         var estadoFiltros = { gasolinera: false, hospital: false, restaurante: false };
 
-        // Datos de locaciones fijas (Gasolineras, Hospitales, Restaurantes de SD)
+        // Coordenadas reales de locaciones en Santo Domingo para las capas
         var locacionesFijas = [
-            { tipo: 'gasolinera', lat: 18.4820, lng: -69.9380, nombre: "⛽ Estación Texaco", desc: "Abierta 24 horas" },
-            { tipo: 'gasolinera', lat: 18.4750, lng: -69.9210, nombre: "⛽ Estación Next", desc: "Combustible y Tienda" },
-            { tipo: 'hospital', lat: 18.4895, lng: -69.9280, nombre: "🏥 Clínica Abreu", desc: "Urgencias Médicas" },
-            { tipo: 'restaurante', lat: 18.4790, lng: -69.9330, nombre: "🍔 McDonald's", desc: "Zona de autoservicio" }
+            { tipo: 'gasolinera', lat: 18.4754, lng: -69.9216, nombre: "⛽ Estación Texaco 27 Feb", desc: "Abierta 24 Horas" },
+            { tipo: 'gasolinera', lat: 18.4831, lng: -69.9391, nombre: "⛽ Estación Total Churchill", desc: "Combustible y Tienda" },
+            { tipo: 'hospital', lat: 18.4812, lng: -69.9145, nombre: "🏥 Hosp. Central de las FF.AA.", desc: "Emergencias 24/7" },
+            { tipo: 'hospital', lat: 18.4891, lng: -69.9290, nombre: "🏥 Clínica Abreu", desc: "Atención Médica Central" },
+            { tipo: 'restaurante', lat: 18.4782, lng: -69.9351, nombre: "🍔 McDonald's Churchill", desc: "Ruta de comida rápida" },
+            { tipo: 'restaurante', lat: 18.4855, lng: -69.9242, nombre: "🍕 Pizza Hut Lincoln", desc: "Área de comida" }
         ];
 
         function showRoles() {
@@ -188,32 +232,36 @@
         function startApp(roleName) {
             document.getElementById('role-screen').style.display = 'none';
             document.getElementById('main-app').style.display = 'block';
+            document.getElementById('user-role-label').innerText = roleName + " Online";
             initMap();
             sincronizarBaseDatos();
+            obtenerGpsReal();
         }
 
         function initMap() {
             if (!map) {
                 map = L.map('map', { center: userLocation, zoom: 13, zoomControl: false });
                 
-                // MAPA OSCURO PROFUNDO ANTERIOR (CartoDB Dark Matter)
+                // MAPA OSCURO PREMIUM (CartoDB Dark Matter)
                 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
 
-                // Inyectar líneas de tráfico brillantes (Rojo y Amarillo Neón)
-                L.polyline([[18.4746, -69.9431], [18.4795, -69.9248]], {color: '#ff3333', weight: 6, opacity: 0.9}).addTo(map).bindPopup("Tránsito Pesado");
-                L.polyline([[18.4851, -69.9392], [18.4890, -69.9210]], {color: '#ffcc00', weight: 6, opacity: 0.9}).addTo(map).bindPopup("Tránsito Moderado");
+                // INYECCIÓN DE TRÁFICO VIVO EN RUTAS PRINCIPALES (Neón Brillante)
+                L.polyline([[18.4746, -69.9431], [18.4795, -69.9248]], {color: '#ff3b30', weight: 6, opacity: 0.9}).addTo(map).bindPopup("<b>Av. 27 de Febrero:</b> Tapón Crítico");
+                L.polyline([[18.4851, -69.9392], [18.4890, -69.9210]], {color: '#ffcc00', weight: 6, opacity: 0.9}).addTo(map).bindPopup("<b>Av. John F. Kennedy:</b> Flujo Moderado");
             }
+            setTimeout(function(){ map.invalidateSize(); }, 300);
         }
 
         function sincronizarBaseDatos() {
-            var almacenadas = localStorage.getItem('radar_dark_db');
-            if (almacenadas) { dbAlertas = JSON.parse(almacenadas); } 
-            else {
+            var almacenadas = localStorage.getItem('radar_ultimate_db');
+            if (almacenadas) {
+                dbAlertas = JSON.parse(almacenadas);
+            } else {
                 dbAlertas = [
                     { id: 1, lat: 18.4795, lng: -69.9248, tipo: 'Tapón Crítico', icono: '🚗', lugar: "Av. 27 de Febrero" },
                     { id: 2, lat: 18.4984, lng: -69.9622, tipo: 'Calle Cerrada', icono: '🚧', lugar: "Autopista Duarte Km 9" }
                 ];
-                localStorage.setItem('radar_dark_db', JSON.stringify(dbAlertas));
+                localStorage.setItem('radar_ultimate_db', JSON.stringify(dbAlertas));
             }
             actualizarInterfaz();
         }
@@ -225,23 +273,32 @@
 
             dbAlertas.forEach(function(alerta) {
                 var customIcon = L.divIcon({
-                    html: `<div style="font-size: 22px; background: #121824; padding: 6px; border-radius: 50%; box-shadow: 0 0 10px var(--electric-blue); display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border: 1px solid var(--electric-blue);">${alerta.icono}</div>`,
-                    className: 'marker-dark', iconSize: [36, 36], iconAnchor: [18, 18]
+                    html: `<div style="font-size: 22px; background: #0c1324; padding: 6px; border-radius: 50%; box-shadow: 0 0 12px var(--electric-blue); display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border: 1px solid var(--electric-blue);">${alerta.icono}</div>`,
+                    className: 'marker-dark', iconSize: [38, 38], iconAnchor: [19, 19]
                 });
 
-                var m = L.marker([alerta.lat, alerta.lng], { icon: customIcon }).addTo(map).bindPopup(`<b>${alerta.tipo}</b><br>${alerta.lugar}`);
+                var m = L.marker([alerta.lat, alerta.lng], { icon: customIcon }).addTo(map).bindPopup(`<b>${alerta.icono} ${alerta.tipo}</b><br><span style='font-size:12px; color:#8e8e93;'>Zona: ${alerta.lugar}</span>`);
                 markersGroup.push(m);
 
-                feedHtml += `<div class="incident-item"><strong>${alerta.icono} ${alerta.lugar}</strong><p style="color:var(--text-muted); font-size:12px;">${alerta.tipo}</p></div>`;
+                var pillClass = (alerta.tipo === 'Tapón Crítico' || alerta.tipo === 'Accidente') ? 'pill-heavy' : 'pill-mod';
+                feedHtml += `
+                    <div class="traffic-item" onclick="enfocarUbicacion(${alerta.lat}, ${alerta.lng})">
+                        <div class="traffic-info">
+                            <h4>${alerta.lugar}</h4>
+                            <p>${alerta.tipo}</p>
+                        </div>
+                        <span class="status-pill ${pillClass}">${alerta.icono} Alerta</span>
+                    </div>
+                `;
             });
-            document.getElementById('feed-container').innerHTML = feedHtml;
+
+            document.getElementById('traffic-feed-container').innerHTML = feedHtml;
         }
 
-        // Encender y apagar Gasolineras, Hospitales, etc.
+        // Activación de Capas de Gasolineras, Hospitales y Comida en Ruta
         function togglePOI(tipo) {
             estadoFiltros[tipo] = !estadoFiltros[tipo];
             
-            // Cambiar color del botón de la interfaz
             var idBtn = tipo === 'gasolinera' ? 'btn-gas' : tipo === 'hospital' ? 'btn-hosp' : 'btn-rest';
             document.getElementById(idBtn).classList.toggle('active');
 
@@ -249,7 +306,12 @@
                 poiMarkers[tipo] = [];
                 locacionesFijas.forEach(function(loc) {
                     if (loc.tipo === tipo) {
-                        var m = L.marker([loc.lat, loc.lng]).addTo(map).bindPopup(`<b>${loc.nombre}</b><br>${loc.desc}`);
+                        var customIconPOI = L.divIcon({
+                            html: `<div style="font-size: 20px; background: #1c2333; padding: 4px; border-radius: 8px; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 4px 10px rgba(0,0,0,0.5);">${loc.nombre.split(' ')[0]}</div>`,
+                            className: 'poi-marker', iconSize: [32, 32], iconAnchor: [16, 16]
+                        });
+
+                        var m = L.marker([loc.lat, loc.lng], { icon: customIconPOI }).addTo(map).bindPopup(`<b>${loc.nombre}</b><br><span style='font-size:12px; color:#aaa;'>${loc.desc}</span>`);
                         poiMarkers[tipo].push(m);
                     }
                 });
@@ -267,10 +329,38 @@
 
         function procesarReporte(tipo, icono) {
             toggleReportModal(false);
-            var nuevaAlerta = { id: Date.now(), lat: userLocation[0] + (Math.random()-0.5)*0.01, lng: userLocation[1] + (Math.random()-0.5)*0.01, tipo: tipo, icono: icono, lugar: "Ruta Detectada" };
+            var calles = ["Av. Winston Churchill", "Av. Abraham Lincoln", "Av. Luperón", "Ruta Actual"];
+            var calleRandom = calles[Math.floor(Math.random() * calles.length)];
+
+            var nuevaAlerta = {
+                id: Date.now(),
+                lat: userLocation[0] + (Math.random() - 0.5) * 0.005,
+                lng: userLocation[1] + (Math.random() - 0.5) * 0.005,
+                tipo: tipo,
+                icono: icono,
+                lugar: calleRandom
+            };
+
             dbAlertas.unshift(nuevaAlerta);
-            localStorage.setItem('radar_dark_db', JSON.stringify(dbAlertas));
+            localStorage.setItem('radar_ultimate_db', JSON.stringify(dbAlertas));
             actualizarInterfaz();
+            map.setView([nuevaAlerta.lat, nuevaAlerta.lng], 15);
+        }
+
+        function enfocarUbicacion(lat, lng) {
+            map.setView([lat, lng], 16);
+        }
+
+        function obtenerGpsReal() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    userLocation = [position.coords.latitude, position.coords.longitude];
+                    map.setView(userLocation, 15);
+                    
+                    L.circle(userLocation, { radius: 100, color: 'var(--electric-blue)', fillColor: 'var(--electric-blue)', fillOpacity: 0.15, weight: 1 }).addTo(map);
+                    L.circleMarker(userLocation, { radius: 7, color: '#ffffff', fillColor: 'var(--electric-blue)', fillOpacity: 1, weight: 3 }).addTo(map).bindPopup("Tu ubicación");
+                });
+            }
         }
     </script>
 </body>
