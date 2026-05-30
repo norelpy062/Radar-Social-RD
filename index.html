@@ -3,83 +3,569 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SNIV | Centro de Control Nacional</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <title>SNIV - Sistema Nacional de Inteligencia Vial</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    
     <style>
-        :root { --dark: #03060f; --neon-blue: #00f2fe; --red: #ff3b30; --yellow: #ffcc00; --glass: rgba(7, 12, 30, 0.85); }
-        body, html { margin: 0; height: 100%; background: var(--dark); color: white; font-family: 'Lexend', sans-serif; overflow: hidden; }
+        :root {
+            --bg-dark-pure: #03060f;
+            --bg-dark-panel: #070c1e;
+            --glass-bg: rgba(7, 12, 30, 0.8);
+            --glass-border: rgba(0, 242, 254, 0.15);
+            --neon-blue: #00f2fe;
+            --neon-cyan: #4facfe;
+            --neon-red: #ff3b30;
+            --neon-yellow: #ffcc00;
+            --neon-green: #34c759;
+            --text-main: #f5f7fa;
+            --text-muted: #7e8da8;
+            --panel-shadow: 0 20px 50px rgba(0,0,0,0.8);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Lexend', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body, html { width: 100%; height: 100%; background-color: var(--bg-dark-pure); color: var(--text-main); overflow: hidden; }
+
+        /* Estilos de scrollbar premium */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.01); }
+        ::-webkit-scrollbar-thumb { background: rgba(0, 242, 254, 0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--neon-blue); }
+
+        /* --- PANTALLA DE INICIO (SNIV CONTROL CENTER) --- */
+        .screen-portal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px;
+            background: radial-gradient(circle at center, #0a1535 0%, var(--bg-dark-pure) 100%);
+        }
+        .portal-grid-bg {
+            position: absolute; width: 100%; height: 100%;
+            background-image: linear-gradient(rgba(0, 242, 254, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 242, 254, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px; pointer-events: none;
+        }
+        .portal-container {
+            width: 100%; max-width: 500px; background: var(--glass-bg); border: 1px solid var(--glass-border);
+            border-radius: 28px; padding: 40px 30px; backdrop-filter: blur(30px); text-align: center;
+            box-shadow: var(--panel-shadow); position: relative; z-index: 10;
+        }
+        .portal-badge {
+            display: inline-block; padding: 6px 14px; background: rgba(0, 242, 254, 0.08);
+            border: 1px solid var(--glass-border); border-radius: 30px; font-size: 11px;
+            text-transform: uppercase; letter-spacing: 2px; color: var(--neon-blue); margin-bottom: 20px;
+        }
+        .portal-title { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700; letter-spacing: -0.5px; line-height: 1.2; margin-bottom: 6px; }
+        .portal-subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 30px; }
+
+        /* Indicadores Nacionales de Inicio */
+        .national-stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 35px; }
+        .stat-portal-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 14px; text-align: left; }
+        .stat-portal-card label { font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px; }
+        .stat-portal-card span { font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 700; color: var(--text-main); }
+
+        .btn-core { width: 100%; padding: 16px; border: none; border-radius: 16px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .btn-neon { background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue)); color: #03060f; font-weight: 700; box-shadow: 0 8px 30px rgba(0, 242, 254, 0.3); }
+        .btn-neon:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0, 242, 254, 0.5); }
+
+        /* --- ENTORNO PRINCIPAL APP --- */
+        #main-dashboard-env { display: none; width: 100%; height: 100%; position: relative; }
+        #map { width: 100%; height: 100%; position: absolute; z-index: 1; background: var(--bg-dark-pure); }
+
+        /* --- CONTROL PANEL IZQUIERDO (DASHBOARD COMPLETO) --- */
+        .dashboard-side-panel {
+            position: absolute; top: 20px; left: 20px; width: 380px; max-height: calc(100% - 40px);
+            background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 24px;
+            padding: 24px; z-index: 1000; backdrop-filter: blur(20px); box-shadow: var(--panel-shadow);
+            display: flex; flex-direction: column; gap: 20px; overflow-y: auto;
+        }
+        .panel-header-system { display: flex; align-items: center; justify-content: space-between; }
+        .sys-identity h2 { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; }
+        .sys-identity p { font-size: 11px; color: var(--neon-blue); font-weight: 500; }
         
-        /* PANTALLA INICIO */
-        #portal { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle, #0a1535, #03060f); padding: 20px; text-align: center; }
-        .card { background: var(--glass); padding: 40px; border-radius: 30px; border: 1px solid var(--neon-blue); max-width: 450px; backdrop-filter: blur(20px); }
-        .warning { background: #ff3b3026; color: var(--red); padding: 8px 16px; border-radius: 20px; font-size: 10px; text-transform: uppercase; font-weight: bold; margin-bottom: 20px; }
-        
-        /* INTERFAZ MAPA */
-        #app { display: none; height: 100%; position: relative; }
-        #map { height: 100%; }
-        .panel { position: absolute; top: 20px; left: 20px; z-index: 1000; width: 350px; background: var(--glass); padding: 20px; border-radius: 20px; backdrop-filter: blur(15px); }
-        
-        /* IA PANEL */
-        .ai-box { margin-top: 15px; padding: 15px; background: rgba(0,242,254,0.05); border-left: 3px solid var(--neon-blue); border-radius: 10px; font-size: 12px; }
-        
-        button { cursor: pointer; border: none; padding: 15px; border-radius: 12px; background: var(--neon-blue); font-weight: bold; width: 100%; }
+        /* Modos Conmutables */
+        .interface-toggle-pill { display: flex; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 4px; border-radius: 12px; }
+        .toggle-tab { flex: 1; padding: 8px; font-size: 11px; font-weight: 600; text-align: center; border-radius: 8px; cursor: pointer; transition: all 0.2s; color: var(--text-muted); }
+        .toggle-tab.active { background: rgba(0, 242, 254, 0.12); color: var(--neon-blue); border: 1px solid rgba(0, 242, 254, 0.2); }
+
+        /* Grid de Telemetría Táctica */
+        .telemetry-dashboard-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .telemetry-card { background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 12px; }
+        .telemetry-card label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; display: block; }
+        .telemetry-card .value { font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 700; margin-top: 2px; }
+
+        /* Capas Conmutables de Mapas */
+        .layer-control-box { display: flex; flex-direction: column; gap: 6px; }
+        .layer-chip-btn { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 10px 14px; border-radius: 10px; font-size: 12px; cursor: pointer; transition: all 0.2s; }
+        .layer-chip-btn:hover { background: rgba(255,255,255,0.05); }
+        .layer-chip-btn.active { border-color: var(--neon-blue); background: rgba(0, 242, 254, 0.04); }
+        .indicator-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+        /* --- SECCIÓN IA PREDICTIVA --- */
+        .ai-engine-card { background: linear-gradient(145deg, rgba(7, 20, 48, 0.6), rgba(4, 8, 20, 0.9)); border: 1px solid rgba(0, 242, 254, 0.25); border-radius: 16px; padding: 16px; position: relative; overflow: hidden; }
+        .ai-engine-card::before { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(0, 242, 254, 0.1), transparent); animation: sweep 3s infinite; }
+        @keyframes sweep { 0% { left: -100%; } 100% { left: 200%; } }
+        .ai-status-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .ai-processing-text { font-size: 11px; color: var(--neon-blue); font-weight: 600; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px; }
+        .ai-pulse-ring { width: 6px; height: 6px; background: var(--neon-blue); border-radius: 50%; box-shadow: 0 0 8px var(--neon-blue); }
+        .ai-risk-list { display: flex; flex-direction: column; gap: 8px; font-size: 12px; }
+        .ai-risk-item { display: flex; justify-content: space-between; background: rgba(0,0,0,0.2); padding: 8px 12px; border-radius: 8px; border-left: 3px solid var(--neon-cyan); }
+
+        /* --- MODO INSTITUCIONAL (EMERGENCIA Y DESPACHO) --- */
+        .institutional-ops-box { display: none; flex-direction: column; gap: 12px; }
+        .incident-log-table { display: flex; flex-direction: column; gap: 8px; max-height: 180px; overflow-y: auto; }
+        .log-row { background: rgba(255,38,38,0.03); border: 1px solid rgba(255,59,48,0.1); padding: 10px; border-radius: 10px; font-size: 11px; display: flex; justify-content: space-between; align-items: center; }
+        .btn-dispatch { background: var(--neon-red); color: white; padding: 4px 10px; border: none; border-radius: 6px; font-size: 10px; font-weight: 600; cursor: pointer; }
+
+        /* --- BOTONES FLOTANTES INTERFAZ (MAPA) --- */
+        .floating-action-trigger {
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 1000;
+            background: #ffffff; color: #03060f; padding: 14px 30px; border-radius: 40px; font-size: 14px;
+            font-weight: 700; border: none; cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex; align-items: center; gap: 8px; transition: all 0.2s;
+        }
+        .floating-action-trigger:active { transform: translateX(-50%) scale(0.96); }
+
+        .control-utility-round {
+            position: absolute; top: 20px; right: 20px; z-index: 1000;
+            width: 46px; height: 46px; background: var(--glass-bg); border: 1px solid var(--glass-border);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;
+            color: var(--neon-blue); box-shadow: var(--panel-shadow); backdrop-filter: blur(10px);
+        }
+
+        /* --- PANEL INTERACTIVO DE REPORTES (ESTILO BOTTOM SHEET IOS) --- */
+        .bottom-sheet-report {
+            position: absolute; bottom: -450px; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 440px; background: var(--glass-bg); border-top: 1px solid var(--glass-border);
+            border-radius: 28px 28px 0 0; padding: 24px; z-index: 1010; backdrop-filter: blur(25px);
+            box-shadow: 0 -15px 40px rgba(0,0,0,0.6); transition: bottom 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .bottom-sheet-report.active { bottom: 0; }
+        .sheet-drag-line { width: 40px; height: 5px; background: rgba(255,255,255,0.2); border-radius: 3px; margin: -10px auto 18px; }
+        .sheet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .grid-options-report { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .opt-report-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 16px 8px; text-align: center; cursor: pointer; transition: all 0.2s; }
+        .opt-report-card:hover { border-color: var(--neon-blue); background: rgba(0,242,254,0.03); }
+        .opt-report-card span { font-size: 26px; display: block; margin-bottom: 6px; }
+        .opt-report-card label { font-size: 11px; font-weight: 500; display: block; cursor: pointer; }
+
+        /* --- ANIMACIONES DE MARCADORES PERSONALIZADOS (NEÓN) --- */
+        .pulse-marker-core { display: flex; align-items: center; justify-content: center; }
+        .marker-neon-ring {
+            width: 16px; height: 16px; border-radius: 50%; position: relative;
+            box-shadow: 0 0 10px cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .marker-neon-ring::after {
+            content: ''; position: absolute; width: 100%; height: 100%; border-radius: 50%;
+            top: 0; left: 0; border: 2px solid inherit; animation: radar-wave 1.8s infinite linear;
+        }
+        @keyframes radar-wave {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(3.5); opacity: 0; }
+        }
+
+        /* Marcador de usuario con efecto radar */
+        .user-gps-core {
+            width: 14px; height: 14px; background: #ffffff; border: 3px solid var(--neon-blue);
+            border-radius: 50%; box-shadow: 0 0 15px var(--neon-blue); position: relative;
+        }
+        .user-gps-core::before {
+            content: ''; position: absolute; top: -15px; left: -15px; width: 38px; height: 38px;
+            border: 2px solid var(--neon-blue); border-radius: 50%; animation: radar-wave 2s infinite linear;
+            opacity: 0;
+        }
+
+        @media (max-width: 480px) {
+            .dashboard-side-panel { width: calc(100% - 32px); top: 16px; left: 16px; max-height: 55%; }
+            .bottom-sheet-report { max-width: 100%; }
+        }
     </style>
 </head>
 <body>
 
-<div id="portal">
-    <div class="card">
-        <div class="warning">Este es un modelo de prueba: esta app se encuentra en desarrollo</div>
-        <h1>SNIV</h1>
-        <p>Sistema Nacional de Inteligencia Vial<br>Radar Social RD</p>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:20px 0;">
-            <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:10px;"><label>Conductores</label><br><b>14,205</b></div>
-            <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:10px;"><label>Alertas</label><br><b>42</b></div>
+    <div id="portal-screen-system" class="screen-portal">
+        <div class="portal-grid-bg"></div>
+        <div class="portal-container">
+            <span class="portal-badge">Centro de Mando Nacional</span>
+            <h1 class="portal-title">Sistema Nacional de Inteligencia Vial (SNIV)</h1>
+            <p class="portal-subtitle">Radar Social RD • Plataforma Ciudadana</p>
+            
+            <div class="national-stats-grid">
+                <div class="stat-portal-card">
+                    <label>Conductores Conectados</label>
+                    <span id="p-users">14,205</span>
+                </div>
+                <div class="stat-portal-card">
+                    <label>Alertas Activas Nacional</label>
+                    <span style="color: var(--neon-yellow);" id="p-alerts">42</span>
+                </div>
+                <div class="stat-portal-card">
+                    <label>Nivel de Riesgo General</label>
+                    <span style="color: var(--neon-red);">MODERADO (34%)</span>
+                </div>
+                <div class="stat-portal-card">
+                    <label>Monitoreo Satelital</label>
+                    <span style="color: var(--neon-green);">OPERATIVO</span>
+                </div>
+            </div>
+
+            <button class="btn-core btn-neon" onclick="entrarPlataforma()">Acceder al Centro de Control</button>
         </div>
-        <button onclick="entrar()">ACCEDER AL CENTRO DE CONTROL</button>
     </div>
-</div>
 
-<div id="app">
-    <div class="panel">
-        <h2 style="font-size: 18px; color: var(--neon-blue);">SNIV • Centro de Monitoreo</h2>
-        <div class="ai-box">
-            <b id="ia-status">IA Analizando Riesgo...</b>
-            <div style="margin-top:5px;">Riesgo Nacional: <span id="risk-val">34%</span></div>
-        </div>
-        <hr style="border:0; border-top:1px solid #333; margin:15px 0;">
-        <button onclick="toggleLayer('accidentes')">Toggle Accidentes (Rojo)</button>
-    </div>
-    <div id="map"></div>
-</div>
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://leaflet.github.io/Leaflet.heat/dist/leaflet-heat.js"></script>
-<script>
-    let map, heatmap;
-    const provincias = [
-        ["Santo Domingo", 18.486, -69.931], ["Santiago", 19.451, -70.697], 
-        ["SFM", 19.301, -70.252], ["La Vega", 19.221, -70.528], 
-        ["Puerto Plata", 19.793, -70.688], ["Higüey", 18.615, -68.707]
-    ];
-
-    function entrar() {
-        document.getElementById('portal').style.display = 'none';
-        document.getElementById('app').style.display = 'block';
-        map = L.map('map').setView([18.850, -70.700], 8);
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
+    <div id="main-dashboard-env">
         
-        // Marcadores
-        provincias.forEach(p => L.marker([p[1], p[2]]).addTo(map).bindPopup(p[0]));
+        <div class="dashboard-side-panel">
+            <div class="panel-header-system">
+                <div class="sys-identity">
+                    <h2>SNIV MONITORING</h2>
+                    <p>Radar Social RD v3.0</p>
+                </div>
+                <div class="live-indicator"><span class="pulse-dot"></span> EN VIVO</div>
+            </div>
 
-        // Heatmap básico
-        heatmap = L.heatLayer([[18.486, -69.931, 0.9], [19.451, -70.697, 0.6]], {radius: 25}).addTo(map);
+            <div class="interface-toggle-pill">
+                <div class="toggle-tab active" id="tab-civic" onclick="cambiarModoPanel('ciudadano')">Panel Ciudadano</div>
+                <div class="toggle-tab" id="tab-gov" onclick="cambiarModoPanel('institucional')">Centro Institucional</div>
+            </div>
 
-        // Simulador IA
-        setInterval(() => {
-            document.getElementById('risk-val').innerText = Math.floor(Math.random() * 50) + 20 + "%";
-        }, 3000);
-    }
-</script>
+            <div id="panel-content-citizen" style="display: flex; flex-direction: column; gap: 20px;">
+                <div class="telemetry-dashboard-grid">
+                    <div class="telemetry-card">
+                        <label>Alertas Hoy</label>
+                        <div class="value" style="color: var(--neon-cyan);">189</div>
+                    </div>
+                    <div class="telemetry-card">
+                        <label>Nodos Conectados</label>
+                        <div class="value">3,124</div>
+                    </div>
+                    <div class="telemetry-card">
+                        <label>Riesgo Nacional</label>
+                        <div class="value" style="color: var(--neon-yellow);">Low-Mod</div>
+                    </div>
+                    <div class="telemetry-card">
+                        <label>Provincias Activas</label>
+                        <div class="value">6</div>
+                    </div>
+                </div>
+
+                <div class="layer-control-box">
+                    <p class="section-title" style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">Filtros de Capas de Red</p>
+                    <div class="layer-chip-btn active" id="layer-acc" onclick="conmutarCapaMapa('accidentes')">
+                        <span>💥 Accidentes Viales</span><div class="indicator-dot" style="background: var(--neon-red);"></div>
+                    </div>
+                    <div class="layer-chip-btn active" id="layer-con" onclick="conmutarCapaMapa('tapones')">
+                        <span>🚗 Congestión / Tapón</span><div class="indicator-dot" style="background: var(--neon-yellow);"></div>
+                    </div>
+                    <div class="layer-chip-btn" id="layer-hos" onclick="conmutarCapaMapa('hospitales')">
+                        <span>🏥 Centros de Emergencia</span><div class="indicator-dot" style="background: var(--neon-cyan);"></div>
+                    </div>
+                    <div class="layer-chip-btn" id="layer-gas" onclick="conmutarCapaMapa('gasolinera')">
+                        <span>Establishments / Servicios</span><div class="indicator-dot" style="background: var(--neon-green);"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="panel-content-institutional" class="institutional-ops-box">
+                <p class="section-title" style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Consola de Despacho 911 / DIGESETT</p>
+                <div class="telemetry-dashboard-grid">
+                    <div class="telemetry-card" style="border-color: rgba(255,59,48,0.3);">
+                        <label>Incidentes Críticos</label>
+                        <div class="value" style="color: var(--neon-red);">03</div>
+                    </div>
+                    <div class="telemetry-card">
+                        <label>Unidades Ruta</label>
+                        <div class="value">45</div>
+                    </div>
+                </div>
+                <div class="incident-log-table">
+                    <div class="log-row">
+                        <div><strong>Colisión Múltiple</strong><br><span style="color:var(--text-muted)">Av. 27 de Feb • Hace 2 min</span></div>
+                        <button class="btn-dispatch" onclick="alert('Unidad de DIGESETT asignada al sector.')">Despachar</button>
+                    </div>
+                    <div class="log-row">
+                        <div><strong>Obstrucción de Vía</strong><br><span style="color:var(--text-muted)">Aut. Duarte Km 9 • Hace 5 min</span></div>
+                        <button class="btn-dispatch" style="background:var(--neon-cyan)" onclick="alert('Grúa institucional alertada.')">Asignar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ai-engine-card">
+                <div class="ai-status-row">
+                    <div class="ai-processing-text"><span class="ai-pulse-ring"></span> <span id="ai-dynamic-status">PROCESANDO CÁLCULO DE RIESGO...</span></div>
+                    <span style="font-family:'Space Grotesk'; font-size:11px; color:var(--neon-blue); font-weight:700;">IA CORE v4.1</span>
+                </div>
+                <div class="ai-risk-list">
+                    <div class="ai-risk-item"><span>Av. 27 de Febrero</span><strong style="color: var(--neon-red);" id="ai-risk-1">82% Riesgo</strong></div>
+                    <div class="ai-risk-item"><span>Autopista Duarte Km 9</span><strong style="color: var(--neon-yellow);" id="ai-risk-2">54% Riesgo</strong></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="control-utility-round" onclick="obtenerGpsReal()">🎯</div>
+
+        <button class="floating-action-trigger" onclick="abrirMenuReporte(true)">
+            ⚠️ Registrar Evento Vial
+        </button>
+
+        <div class="bottom-sheet-report" id="report-sheet-view">
+            <div class="sheet-drag-line"></div>
+            <div class="sheet-header">
+                <h3 style="font-size:16px; font-weight:700;">Transmisión de Alerta en Tiempo Real</h3>
+                <div class="close-circle" onclick="abrirMenuReporte(false)">✕</div>
+            </div>
+            <div class="grid-options-report">
+                <div class="opt-report-card" onclick="inyectarReporteCiudadano('Accidente Crítico', '💥', 'accidentes')"><span>💥</span><label>Accidente</label></div>
+                <div class="opt-report-card" onclick="inyectarReporteCiudadano('Tapón Pesado', '🚗', 'tapones')"><span>🚗</span><label>Tapón</label></div>
+                <div class="opt-report-card" onclick="inyectarReporteCiudadano('Bloqueo de Vía', '🚧', 'accidentes')"><span>🚧</span><label>Bloqueo</label></div>
+                <div class="opt-report-card" onclick="inyectarReporteCiudadano('Fallo de Semáforo', '🚦', 'tapones')"><span>🚦</span><label>Semáforo</label></div>
+                <div class="opt-report-card" onclick="inyectarReporteCiudadano('Peligro en Calzada', '🕳️', 'accidentes')"><span>🕳️</span><label>Hoyo Vial</label></div>
+                <div class="opt-report-card" onclick="inyectarReporteCiudadano('Control Policial', '👮', 'tapones')"><span>👮</span><label>Retén</label></div>
+            </div>
+        </div>
+
+        <div id="map"></div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://leaflet.github.io/Leaflet.heat/dist/leaflet-heat.js"></script>
+
+    <script>
+        var map;
+        var centerRD = [18.8500, -70.7000]; // Coordenadas centrales de República Dominicana
+        
+        // Grupos de Capas de Datos Exclusivas
+        var capasRed = {
+            accidentes: L.layerGroup(),
+            tapones: L.layerGroup(),
+            hospitales: L.layerGroup(),
+            gasolinera: L.layerGroup(),
+            heatmap: L.layerGroup()
+        };
+
+        // Estado interno de activación de capas
+        var estadoCapasActivas = { accidentes: true, tapones: true, hospitales: false, gasolinera: false, heatmap: true };
+
+        // Datos Estratégicos Estáticos de Provincias Obligatorias
+        var nodosProvincias = [
+            { nombre: "Santo Domingo", coords: [18.4861, -69.9312], riesgo: "Crítico", color: "#ff3b30" },
+            { nombre: "Santiago", coords: [19.4517, -70.6970], riesgo: "Moderado", color: "#ffcc00" },
+            { nombre: "San Francisco de Macorís", coords: [19.3010, -70.2526], riesgo: "Bajo", color: "#34c759" },
+            { nombre: "La Vega", coords: [19.2214, -70.5289], riesgo: "Moderado", color: "#ffcc00" },
+            { nombre: "Puerto Plata", coords: [19.7934, -70.6884], riesgo: "Bajo", color: "#34c759" },
+            { nombre: "Higüey", coords: [18.6152, -68.7078], riesgo: "Moderado", color: "#ffcc00" }
+        ];
+
+        // POIs Reales Iniciales de Servicios e Infraestructura
+        var dataServiciosFijos = [
+            { tipo: 'hospital', lat: 18.4891, lng: -69.9290, titulo: "🏥 Clínica Abreu (SD)" },
+            { tipo: 'hospital', lat: 19.4421, lng: -70.6811, titulo: "🏥 Hospital Metropolitano (Santiago)" },
+            { tipo: 'gasolinera', lat: 18.4754, lng: -69.9216, titulo: "⛽ Estación Texaco 27 Feb" },
+            { tipo: 'gasolinera', lat: 19.2185, lng: -70.5210, titulo: "⛽ Estación Sunix La Vega" }
+        ];
+
+        function entrarPlataforma() {
+            document.getElementById('portal-screen-system').style.display = 'none';
+            document.getElementById('main-dashboard-env').style.display = 'block';
+            initEcosistemaMapa();
+        }
+
+        function initEcosistemaMapa() {
+            if (!map) {
+                // Configuraciones de visualización fluida de Leaflet optimizada para pantallas móviles
+                map = L.map('map', { center: centerRD, zoom: 8, zoomControl: false, fadeAnimation: true });
+                
+                // Capa de mapa base premium ultra-oscura estilo centro de control táctico
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                    maxZoom: 20
+                }).addTo(map);
+
+                // Carga y despliegue de las capas de infraestructura base
+                reconstruirNodosNacionales();
+                inyectarServiciosFijos();
+                cargarMapaDeCalorRiesgo();
+
+                // Montar en el mapa solo las capas por defecto activadas
+                for (var key in capasRed) {
+                    if (estadoCapasActivas[key]) { capasRed[key].addTo(map); }
+                }
+
+                // Simulación inicial de líneas de tráfico de rutas principales
+                simularLineasDeTratficoEstructurales();
+                
+                // Ejecución automatizada del motor analítico de IA
+                initCicloMotorIA();
+            }
+            setTimeout(function(){ map.invalidateSize(); }, 250);
+        }
+
+        function reconstruirNodosNacionales() {
+            nodosProvincias.forEach(function(prov) {
+                var iconNeonNode = L.divIcon({
+                    html: `<div class="pulse-marker-core"><div class="marker-neon-ring" style="background:${prov.color}; box-shadow: 0 0 12px ${prov.color}; border: 2px solid #fff;"></div></div>`,
+                    className: 'neon-node-marker', iconSize: [16, 16], iconAnchor: [8, 8]
+                });
+
+                L.marker(prov.coords, { icon: iconNeonNode }).addTo(map)
+                    .bindPopup(`<b>Nodo Provincial: ${prov.nombre}</b><br><span style="color:${prov.color}">Riesgo de Tránsito: ${prov.riesgo}</span>`);
+            });
+        }
+
+        function inyectarServiciosFijos() {
+            dataServiciosFijos.forEach(function(item) {
+                var iconEmoji = item.tipo === 'hospital' ? '🏥' : '⛽';
+                var colorPoi = item.tipo === 'hospital' ? 'var(--neon-blue)' : 'var(--neon-green)';
+                
+                var customIconPOI = L.divIcon({
+                    html: `<div style="font-size: 16px; background: #070c1e; padding: 4px; border-radius: 8px; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: 1px solid ${colorPoi}; box-shadow: 0 4px 10px rgba(0,0,0,0.4);">${iconEmoji}</div>`,
+                    className: 'poi-marker-core', iconSize: [28, 28], iconAnchor: [14, 14]
+                });
+
+                var targetLayer = item.tipo === 'hospital' ? capasRed.hospitales : capasRed.gasolinera;
+                L.marker([item.lat, item.lng], { icon: customIconPOI }).addTo(targetLayer).bindPopup(`<b>${item.titulo}</b><br><span style="color:#8e8e93; font-size:11px;">Estructura Crítica Registrada</span>`);
+            });
+        }
+
+        function cargarMapaDeCalorRiesgo() {
+            // Puntos calientes simulados basados en las estadísticas de colisiones de República Dominicana
+            var puntosCalorRiesgo = [
+                [18.4861, -69.9312, 0.9], // Alta densidad en Santo Domingo
+                [18.4795, -69.9248, 0.8],
+                [19.4517, -70.6970, 0.7], // Santiago
+                [19.2214, -70.5289, 0.5], // La Vega
+                [18.4900, -69.8500, 0.6]  // Santo Domingo Este
+            ];
+
+            // Configuración nativa del complemento de mapa de calor Leaflet Heat
+            L.heatLayer(puntosCalorRiesgo, {
+                radius: 25,
+                blur: 15,
+                maxZoom: 10,
+                gradient: { 0.2: 'blue', 0.4: 'cyan', 0.6: 'yellow', 1: 'red' }
+            }).addTo(capasRed.heatmap);
+        }
+
+        // FUNCIÓN ESTRUCTURADA PARA ENTRADA FUTURA DE APIS (PREPARACIÓN ARQUITECTURA)
+        function simularLineasDeTratficoEstructurales() {
+            /* PREPARACIÓN DE ARQUITECTURA DE DATOS PARA CONSUMO DE CAPAS EXTERNAS:
+               - Para Google Traffic Layer: Inyectar script mediante mapas híbridos.
+               - Para TomTom / HERE API: Fetch a endpoints de vector-tiles e instanciar GeoJSON polylines.
+            */
+            var tramosAvenidas = [
+                [[18.4746, -69.9431], [18.4795, -69.9248]], // Fragmento 27 de Febrero
+                [[18.4851, -69.9392], [18.4890, -69.9210]]  // Fragmento Kennedy
+            ];
+            
+            L.polyline(tramosAvenidas[0], {color: 'var(--neon-red)', weight: 5, opacity: 0.85}).addTo(capasRed.tapones).bindPopup("<b>Tramo TomTom SIM:</b> Retención severa detectada.");
+            L.polyline(tramosAvenidas[1], {color: 'var(--neon-yellow)', weight: 5, opacity: 0.85}).addTo(capasRed.tapones).bindPopup("<b>Tramo HERE SIM:</b> Flujo ralentizado.");
+        }
+
+        function conmutarCapaMapa(capaKey) {
+            estadoCapasActivas[capaKey] = !estadoCapasActivas[capaKey];
+            var btnElement = document.getElementById(`layer-${capaKey.substring(0,3)}`);
+            
+            if (btnElement) btnElement.classList.toggle('active', estadoCapasActivas[capaKey]);
+
+            if (estadoCapasActivas[capaKey]) {
+                map.addLayer(capasRed[capaKey]);
+            } else {
+                map.removeLayer(capasRed[capaKey]);
+            }
+        }
+
+        function cambiarModoPanel(modo) {
+            document.getElementById('tab-civic').classList.toggle('active', modo === 'ciudadano');
+            document.getElementById('tab-gov').classList.toggle('active', modo === 'institucional');
+            
+            document.getElementById('panel-content-citizen').style.display = modo === 'ciudadano' ? 'flex' : 'none';
+            document.getElementById('panel-content-institutional').style.display = modo === 'institucional' ? 'flex' : 'none';
+        }
+
+        function abrirMenuReporte(abrir) {
+            document.getElementById('report-sheet-view').classList.toggle('active', abrir);
+        }
+
+        function inyectarReporteCiudadano(tipo, icono, capaDestino) {
+            abrirMenuReporte(false);
+            
+            /*
+               PREPARACIÓN PARA BASE DE DATOS EN LA NUBE (Supabase/Firebase Integration):
+               // Ejemplo de inserción futura:
+               const { data, error } = await supabase.from('incidentes').insert([{ lat: userLocation[0], lng: userLocation[1], tipo: tipo }]);
+            */
+
+            // Simulación de coordenadas de reporte cercanas al usuario
+            var latVariada = userLocation[0] + (Math.random() - 0.5) * 0.006;
+            var lngVariada = userLocation[1] + (Math.random() - 0.5) * 0.006;
+
+            var customIconReport = L.divIcon({
+                html: `<div style="font-size: 20px; background: #03060f; padding: 6px; border-radius: 50%; box-shadow: 0 0 12px var(--neon-red); display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border: 1px solid var(--neon-red);">${icono}</div>`,
+                className: 'user-report-marker', iconSize: [34, 34], iconAnchor: [17, 17]
+            });
+
+            L.marker([latVariada, lngVariada], { icon: customIconReport }).addTo(capasRed[capaDestino])
+                .bindPopup(`<b>Alerta Ciudadana: ${tipo}</b><br><span style="color:var(--text-muted); font-size:11px;">Enviado en tiempo real desde el dispositivo móvil.</span>`).openPopup();
+            
+            map.setView([latVariada, lngVariada], 14);
+        }
+
+        // MOTOR RECURSIVO DE INTELIGENCIA ARTIFICIAL PREDICTIVA
+        function initCicloMotorIA() {
+            var estadosDeIA = [
+                "DETECTANDO CONGESTIÓN VEHICULAR...",
+                "ANALIZANDO VELOCIDAD PROMEDIO DE RUTA...",
+                "PROCESANDO REPORTES CIUDADANOS...",
+                "CALCULANDO RIESGO DE ACCIDENTES EN ZONA..."
+            ];
+            var indice = 0;
+
+            setInterval(function() {
+                // Actualizar estado textual superior
+                document.getElementById('ai-dynamic-status').innerText = estadosDeIA[indice];
+                
+                // Variación aleatoria controlada de métricas para simulación analítica de riesgo vial
+                var riesgo1 = Math.floor(Math.random() * (95 - 70 + 1)) + 70;
+                var riesgo2 = Math.floor(Math.random() * (65 - 40 + 1)) + 40;
+
+                document.getElementById('ai-risk-1').innerText = `${riesgo1}% Riesgo`;
+                document.getElementById('ai-risk-2').innerText = `${riesgo2}% Riesgo`;
+
+                indice = (indice + 1) % estadosDeIA.length;
+            }, 4000);
+        }
+
+        // SERVICIO DE GEOLOCALIZACIÓN PREMIUM DE ACTUALIZACIÓN CONTINUA (GPS)
+        function obtenerGpsReal() {
+            if (navigator.geolocation) {
+                // Configuración de WatchPosition para mantener rastreo de la ubicación de forma continua
+                navigator.geolocation.watchPosition(function(position) {
+                    var lat = position.coords.latitude;
+                    var lng = position.coords.longitude;
+                    userLocation = [lat, lng];
+
+                    // Iconografía dinámica con onda expansiva de radar para la posición del usuario
+                    var userGpsIcon = L.divIcon({
+                        html: `<div class="user-gps-core"></div>`,
+                        className: 'user-location-radar', iconSize: [14, 14], iconAnchor: [7, 7]
+                    });
+
+                    // Eliminar capas duplicadas del marcador GPS si ya existían para evitar sobrecarga
+                    if (window.currentUserMarker) { map.removeLayer(window.currentUserMarker); }
+                    
+                    window.currentUserMarker = L.marker(userLocation, { icon: userGpsIcon }).addTo(map)
+                        .bindPopup("<b>Tu Telemetría de Ruta</b><br><span style='font-size:11px; color:#00f2fe;'>Ubicación Sincronizada Activa</span>");
+
+                    // Si es la primera ejecución, centrar el foco del mapa sobre el conductor
+                    if(!window.mapCentrado) {
+                        map.setView(userLocation, 14);
+                        window.mapCentrado = true;
+                    }
+                }, function(error) {
+                    console.log("Acceso de geolocalización denegado. Manteniendo nodo por defecto.");
+                }, { enableHighAccuracy: true, timeout: 10000 });
+            }
+        }
+    </script>
 </body>
 </html>
