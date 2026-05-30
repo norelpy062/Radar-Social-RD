@@ -3,11 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SNIV | Centro de Control Nacional | Radar Social RD</title>
-    
+    <title>SNIV | Centro de Control Nacional</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-    
     <style>
         :root {
             --bg-dark: #02050a;
@@ -24,98 +22,74 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
         body, html { width: 100%; height: 100%; background: var(--bg-dark); color: var(--text-main); overflow: hidden; }
 
-        /* --- FONDO TECNOLÓGICO SATELITAL --- */
-        #bg-fx {
-            position: fixed; inset: 0; z-index: 0;
-            background: radial-gradient(circle at 50% 50%, rgba(0, 50, 100, 0.2) 0%, #02050a 80%);
-        }
-        .radar-pulse {
-            position: absolute; border: 1px solid rgba(0, 242, 254, 0.15);
-            border-radius: 50%; animation: ping 4s cubic-bezier(0, 0, 0.2, 1) infinite;
-        }
-        @keyframes ping { 0% { transform: scale(0.1); opacity: 0; } 50% { opacity: 0.4; } 100% { transform: scale(2); opacity: 0; } }
+        /* --- FONDO TECH --- */
+        #bg-fx { position: fixed; inset: 0; z-index: 0; background: radial-gradient(circle at 50% 50%, rgba(0, 50, 100, 0.15) 0%, #02050a 80%); }
+        .radar-pulse { position: absolute; border: 1px solid rgba(0, 242, 254, 0.1); border-radius: 50%; animation: ping 6s infinite; }
+        @keyframes ping { 0% { transform: scale(0.1); opacity: 0; } 50% { opacity: 0.3; } 100% { transform: scale(3); opacity: 0; } }
 
-        /* --- PORTAL DE INICIO (ESTILO APPLE VISION) --- */
-        .portal-overlay {
-            position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px;
-        }
-        .portal-card {
-            width: 100%; max-width: 500px; background: var(--glass-bg);
-            backdrop-filter: blur(25px); border: 1px solid var(--border-glow);
-            border-radius: 32px; padding: 40px; text-align: center;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.6);
-        }
-        .warning-label {
-            display: inline-block; background: rgba(255, 159, 10, 0.1); border: 1px solid #ff9f0a;
-            color: #ff9f0a; padding: 6px 16px; border-radius: 20px; font-size: 11px; font-weight: 700;
-            letter-spacing: 0.5px; margin-bottom: 20px; text-transform: uppercase;
-        }
-
-        /* --- BOTÓN APPLE VISION PRO STYLE --- */
-        .btn-main {
-            width: 100%; padding: 18px; border: none; border-radius: 16px;
-            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
-            color: var(--bg-dark); font-weight: 700; cursor: pointer;
-            transition: all 0.3s ease; box-shadow: 0 10px 20px rgba(0, 242, 254, 0.2);
-        }
-        .btn-main:hover { transform: scale(1.03); filter: brightness(1.2); box-shadow: 0 15px 30px rgba(0, 242, 254, 0.4); }
-
-        /* --- BARRA SUPERIOR INSTITUCIONAL --- */
-        .top-nav {
-            position: absolute; top: 0; left: 0; width: 100%; z-index: 2000;
-            padding: 20px 30px; display: flex; justify-content: space-between; align-items: center;
-            background: linear-gradient(to bottom, rgba(2,5,10,0.8), transparent);
-        }
-
-        /* --- MAPA ESTRUCTURA --- */
+        /* --- UI PRINCIPAL --- */
+        #main-app { display: none; width: 100%; height: 100%; position: relative; }
         #map { width: 100%; height: 100%; z-index: 1; filter: grayscale(0.2) contrast(1.1); }
+
+        /* --- PORTAL INICIAL --- */
+        .portal-overlay { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .portal-card { width: 100%; max-width: 500px; background: var(--glass-bg); backdrop-filter: blur(25px); border: 1px solid var(--border-glow); border-radius: 32px; padding: 40px; text-align: center; box-shadow: 0 30px 60px rgba(0,0,0,0.6); }
+        .warning-label { display: inline-block; background: rgba(255, 159, 10, 0.1); border: 1px solid #ff9f0a; color: #ff9f0a; padding: 6px 16px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 20px; }
+        .btn-main { width: 100%; padding: 18px; border: none; border-radius: 16px; background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue)); color: var(--bg-dark); font-weight: 700; cursor: pointer; transition: all 0.3s ease; }
+        .btn-main:hover { transform: scale(1.03); filter: brightness(1.2); }
+
+        /* --- DASHBOARD PANEL --- */
+        .side-panel { position: absolute; top: 80px; left: 20px; width: 350px; background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--border-glow); border-radius: 24px; padding: 20px; z-index: 1000; }
+        .stat-card { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 12px; margin-bottom: 10px; }
+        
+        /* --- NAVEGACIÓN Y CAPAS --- */
+        .top-nav { position: absolute; top: 0; width: 100%; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; z-index: 2000; background: linear-gradient(to bottom, rgba(2,5,10,0.8), transparent); }
+        .layer-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 11px; margin-top: 5px; display: block; width: 100%; text-align: left; }
     </style>
 </head>
 <body>
 
-    <div id="bg-fx">
-        <div class="radar-pulse" style="width: 500px; height: 500px; left: 10%; top: 20%;"></div>
-    </div>
+    <div id="bg-fx"><div class="radar-pulse" style="width: 600px; height: 600px; left: 10%; top: 10%;"></div></div>
 
     <div class="portal-overlay" id="portal-screen">
         <div class="portal-card">
             <div class="warning-label">⚠️ Modelo de prueba • En desarrollo</div>
             <h1 style="font-family: 'Space Grotesk'; font-size: 28px; margin-bottom: 10px;">SNIV</h1>
             <p style="color: var(--text-muted); margin-bottom: 30px;">Sistema Nacional de Inteligencia Vial</p>
-
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 30px;">
-                <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 16px;">
-                    <label style="font-size: 10px; color: var(--text-muted);">CONECTADOS</label>
-                    <div style="font-weight: 700; font-size: 18px;">14,205</div>
-                </div>
-                <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 16px;">
-                    <label style="font-size: 10px; color: var(--text-muted);">ALERTAS</label>
-                    <div style="font-weight: 700; font-size: 18px; color: var(--neon-yellow);">42</div>
-                </div>
-            </div>
-
             <button class="btn-main" onclick="entrarPlataforma()">INICIAR CENTRO DE MANDO</button>
         </div>
     </div>
 
-    <div class="top-nav" id="top-nav" style="display: none;">
-        <div style="font-weight: 700; display: flex; align-items: center; gap: 10px;">
-            <div style="width: 8px; height: 8px; background: var(--neon-blue); border-radius: 50%;"></div>
-            SNIV | Radar Social RD
+    <div id="main-app">
+        <div class="top-nav">
+            <div style="font-weight: 700;">🛰️ SNIV | Dashboard Nacional</div>
+            <div id="clock" style="font-size: 12px; color: var(--text-muted);">🟢 OPERATIVO</div>
         </div>
-        <div id="clock" style="font-size: 12px; color: var(--text-muted);">🟢 OPERATIVO | 29 MAY 2026 - 21:25</div>
-    </div>
 
-    <div id="map"></div>
+        <div class="side-panel">
+            <h3 style="margin-bottom: 15px; font-size: 14px;">Telemetría en tiempo real</h3>
+            <div class="stat-card">
+                <label style="font-size: 10px; color: var(--text-muted);">Riesgo Nacional</label>
+                <div id="riesgo-val" style="font-weight: 700; font-size: 18px;">Moderado (34%)</div>
+            </div>
+            <div id="layer-controls">
+                <button class="layer-btn" onclick="toggleLayer('traffic')">🚗 Capa de Tráfico (ON)</button>
+                <button class="layer-btn" onclick="toggleLayer('incidents')">💥 Accidentes</button>
+            </div>
+        </div>
+
+        <div id="map"></div>
+    </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        var map;
+        let map;
         const trafficLayer = L.layerGroup();
+        const incidentsLayer = L.layerGroup();
 
         function entrarPlataforma() {
             document.getElementById('portal-screen').style.display = 'none';
-            document.getElementById('top-nav').style.display = 'flex';
+            document.getElementById('main-app').style.display = 'block';
             
             map = L.map('map', { zoomControl: false }).setView([18.4861, -69.9312], 12);
             L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
@@ -124,14 +98,20 @@
             actualizarTraficoTiempoReal();
         }
 
+        // Arquitectura preparada para futuro consumo de API
         function actualizarTraficoTiempoReal() {
-            console.log("Arquitectura lista: Esperando endpoint de tráfico...");
+            console.log("Sistema listo: Esperando integración de API de tráfico.");
         }
 
-        // Función para mantener la hora actualizada
+        function toggleLayer(type) {
+            if (type === 'traffic') {
+                map.hasLayer(trafficLayer) ? map.removeLayer(trafficLayer) : map.addLayer(trafficLayer);
+            }
+        }
+
         setInterval(() => {
             const now = new Date();
-            document.getElementById('clock').innerText = `🟢 OPERATIVO | ${now.toLocaleDateString()} - ${now.toLocaleTimeString()}`;
+            document.getElementById('clock').innerText = `🟢 OPERATIVO | ${now.toLocaleTimeString()}`;
         }, 1000);
     </script>
 </body>
